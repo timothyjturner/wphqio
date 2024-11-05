@@ -1,0 +1,11 @@
+/*
+Theme Name: WP HQIO
+Theme URI: https://example.com
+Author: Your Name
+Author URI: https://example.com
+Description: A lightweight WordPress theme with SCSS and CSS reset.
+Version: 1.0.0
+Text Domain: wphqio
+*/
+
+@import url('assets/css/style.css');

@@ -2,6 +2,14 @@
 
 WPHQIO is a modern and simple WordPress theme intended for wphq.io
 
+## Installation (requires Node 12+)
+npm init -y
+npm install gulp gulp-sass sass gulp-autoprefixer --save-dev
+npm install
+
+## Task Runner
+npm install
+
 ## Features
 
 - **Responsive Design**: Optimized for mobile, tablet, and desktop devices.
