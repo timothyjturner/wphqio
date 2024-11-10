@@ -8,3 +8,13 @@ function wphqio_theme_setup() {
 }
 
 add_action( 'wp_enqueue_scripts', 'wphqio_theme_setup' );
+
+function wpb_custom_new_menu() {
+    register_nav_menus(
+      array(
+        'main-menu' => __( 'Main Menu' ),
+        'footer-menu' => __( 'Footer Menu' )
+      )
+    );
+  }
+  add_action( 'init', 'wpb_custom_new_menu' );
