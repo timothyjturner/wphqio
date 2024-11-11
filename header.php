@@ -10,7 +10,7 @@
 
 <header class="global-header">
     <div class="container">
-        <div class="row">
+        <div class="row align-center">
             <div class="header-logo col-md-3">
                 <img src="/wp-content/uploads/2024/11/wphq-logo.png">
             </div>
