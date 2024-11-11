@@ -1,0 +1,38 @@
+.container{
+    max-width: 1240px;
+    padding: 0px 20px;
+}
+.row{
+    display: flex;
+    flex-wrap: wrap;
+}
+.col-md-2{
+    width: 20%;
+}
+.col-md-3{
+    width: 25%;
+}
+.col-md-4{
+    width: 33.33%;
+}
+.col-md-5{
+    width: 40%;
+}
+.col-md-6{
+    width: 50%;
+}
+.col-md-7{
+    width: 60%;
+}
+.col-md-8{
+    width: 66.66%;
+}
+.col-md-9{
+    width: 75%;
+}
+.col-md-10{
+    width: 80%;
+}
+.col-md-12{
+    width: 100%;
+}
