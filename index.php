@@ -22,7 +22,7 @@
 
 <section class="solutions-sect">
     <div class="container">
-        <h2>Solutions</h2>
+        <h2 class="text-center">Solutions</h2>
 
         <div class="row">
             <div class="col-md-4 card">
@@ -33,7 +33,7 @@
 
                     <p>Keep your WordPress site secure, fast, and up-to-date with our managed hosting and maintenance plans.</p>
 
-                    <a class="link" href="#">Learn More</a>
+                    <a class="link underline" href="#">Learn More</a>
                 </div>
             </div>
             <div class="col-md-4 card">
@@ -44,7 +44,7 @@
 
                     <p>Take the guesswork out of search engine optimization. Our tailored strategies improve rankings, boost traffic, and drive leads.</p>
 
-                    <a class="link" href="#">Learn More</a>
+                    <a class="link underline" href="#">Learn More</a>
                 </div>
             </div>
             <div class="col-md-4 card">
@@ -55,7 +55,7 @@
 
                     <p>Need something unique? Our custom development services are designed to create powerful WordPress websites tailored to your exact needs.</p>
 
-                    <a class="link" href="#">Learn More</a>
+                    <a class="link underline" href="#">Learn More</a>
                 </div>
             </div>
         </div>
