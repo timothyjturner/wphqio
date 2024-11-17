@@ -62,4 +62,25 @@
     </div>
 </section>
 
+<section class="cta">
+    <div class="container">
+        <div class="row align-center">
+            <div class="col-md-8">
+                <h2>Ready to Transform Your Website?</h2>
+
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
+
+                <div class="row">
+                    <a class="white-btn" href="#">Request a Quote</a>
+                    <a class="primary-btn" href="#">Get Started</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <img class="w-100" src="/wp-content/uploads/2024/11/transform-your-website-min_11zon-1-scaled.webp">
+            </div>
+        </div>
+    </div>
+</section>
+
 <?php get_footer(); ?>

@@ -75,7 +75,7 @@ section.solutions-sect {
                 height: 100%;
                 position: relative;
 
-                .img {
+                img {
                     max-width: 80px;
                 }
 
@@ -181,6 +181,35 @@ section.solutions-sect {
                     }
                 }
             }
+        }
+    }
+}
+
+section.cta {
+    padding: 50px 0px;
+
+    .row {
+        background-color: $accent-color;
+        padding: 60px 70px;
+        border-radius: 25px;
+
+        .col-md-8 {
+            padding-right: 120px;
+
+            .row {
+                margin-top: 40px;
+                gap: 20px;
+            }
+        }
+
+        h2 {
+            color: $white;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: $white;
+            font-size: 18px;
         }
     }
 }
