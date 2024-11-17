@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="col-md-6 img">
-                <img src="/wp-content/uploads/2024/11/regular-consultations.jpg">
+                <img class="w-100" src="/wp-content/uploads/2024/11/home-hero-min-scaled.webp">
             </div>
         </div>
     </div>

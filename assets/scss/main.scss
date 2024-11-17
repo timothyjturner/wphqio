@@ -28,3 +28,24 @@
         }
     }
 }
+
+// banner styling
+section.banner {
+    padding: 80px 0px;
+    background-color: $primary-color;
+
+    .row {
+        .col-md-6.content {
+            padding-right: 70px;
+        }
+
+        h1 {
+            color: $secondary-color;
+        }
+        
+        p {
+            font-size: 18px;
+            color: $white;
+        }
+    }
+}
