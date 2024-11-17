@@ -20,7 +20,27 @@ a {
     text-decoration: none;
 }
 h1 {
-    font-size: 40px;
-    line-height: 52px;
+    font-size: 55px;
+    line-height: 70px;
     margin-bottom: 20px;
+}
+h2 {
+    font-size: 50px;
+    line-height: 62px;
+}
+a.primary-btn {
+    background-color: #d86e26;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: 600;
+}
+a.white-btn {
+    background-color: white;
+    color: #d86e26;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: 600;
 }
