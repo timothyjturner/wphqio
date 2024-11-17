@@ -13,6 +13,7 @@
         list-style: none;
         gap: 50px;
         justify-content: end;
+        align-items: center;
 
         li.menu-item {
 
@@ -199,6 +200,8 @@ section.cta {
             .row {
                 margin-top: 40px;
                 gap: 20px;
+                padding: 0px;
+                border-radius: 0px;
             }
         }
 
