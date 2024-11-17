@@ -53,12 +53,18 @@ footer.global-footer {
                 margin-bottom: 10px;
 
                 a {
-                    color: $accent-color;
+                    color: $secondary-color;
 
                     &:hover {
                         text-decoration: underline;
                     }
                 }
+            }
+        }
+        
+        .col-md-4 {
+            a {
+                color: $secondary-color;
             }
         }
     }
