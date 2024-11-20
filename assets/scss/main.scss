@@ -3,9 +3,13 @@
 @import 'grid';
 
 // Header CSS
-.header-logo {
-    img {
-        max-width: 120px;
+header.global-header {
+    background: linear-gradient(-180deg, #000000, #223847);
+
+    .header-logo {
+        img {
+            max-width: 120px;
+        }
     }
 }
 .main-menu {
@@ -23,9 +27,23 @@
             }
 
             a {
-                color: $black;
+                color: $white;
                 text-decoration: none;
                 font-size: 18px;
+            }
+        }
+
+        li.request-btn {
+            background-color: #d86e2600;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 35px;
+            border: 2px solid #d86e26;
+            margin-right: 0px !important;
+
+            a {
+                color: #d86e26 !important;
             }
         }
     }
@@ -61,7 +79,7 @@ footer.global-footer {
                 }
             }
         }
-        
+
         .col-md-4 {
             a {
                 color: $secondary-color;
@@ -80,6 +98,31 @@ footer.global-footer {
 section.banner {
     padding: 120px 0px;
     background-color: $primary-color;
+    position: relative;
+
+    &:before {
+        content: '';
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        top: 40px;
+        background-color: #223847;
+        border-radius: 50%;
+        right: 30px;
+    }
+
+    .container {
+        position: relative;
+
+        &:before {
+            content: '';
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            background-color: #d86e26;
+            border-radius: 50%;
+        }
+    }
 
     .row {
         .col-md-6.content {
@@ -103,7 +146,7 @@ section.banner {
 }
 
 section.solutions-sect {
-    padding: 100px 0px;
+    padding: 100px 0px 0px 0px;
 
     h2 {
         color: $primary-color;
@@ -233,7 +276,7 @@ section.solutions-sect {
 }
 
 section.cta {
-    padding: 50px 0px;
+    padding: 100px 0px;
 
     .row {
         background-color: $accent-color;
