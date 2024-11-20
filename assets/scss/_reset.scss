@@ -36,6 +36,15 @@ h2 {
     font-size: 18px;
     font-weight: 600;
     margin-right: 0px !important;
+    position: relative;
+
+    img {
+        width: 20px;
+        height: 20px;
+        position: relative;
+        top: 4px;
+        left: 7px;
+    }
 }
 .primary-btn a {
     color: white !important;

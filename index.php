@@ -6,11 +6,13 @@
             <div class="col-md-6 content">
                 <h1>Elevate Your WordPress Website with Proven Marketing Expertise</h1>
 
-                <p>Your website deserves more than generic solutions. At WPHQ, we specialize in WordPress hosting, maintenance, and SEO services designed to drive results. Let us handle the technical side, so you can focus on growing your business.</p>
+                <p>
+                    Your website deserves more than generic solutions. At WPHQ, we specialize in WordPress hosting, maintenance, and SEO services designed to drive results. Let us handle the technical side, so you can focus on growing your business.
+                </p>
 
                 <div class="row">
-                    <a class="white-btn" href="#">Learn More</a>
-                    <a class="primary-btn" href="#">Get Started</a>
+                    <a class="white-btn" href="#">Request a Quote</a>
+                    <a class="primary-btn" href="#">Get Started <img src="/wp-content/uploads/2024/11/down-arrow.png"></a>
                 </div>
             </div>
             <div class="col-md-6 img">
@@ -72,7 +74,7 @@
 
                 <div class="row">
                     <a class="white-btn" href="#">Request a Quote</a>
-                    <a class="primary-btn" href="#">Get Started</a>
+                    <a class="primary-btn" href="#">Get Started <img src="/wp-content/uploads/2024/11/down-arrow.png"></a>
                 </div>
             </div>
 
