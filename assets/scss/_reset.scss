@@ -91,8 +91,31 @@ a.black-btn {
     border-color: #ffffff;
     text-align: center;
 }
-.btn-dropdown-wrapper .dropdown {
+.btn-dropdown-wrapper .dropdown, .primary-btn .sub-menu {
     display: none;
+    position: absolute;
+    width: 100%;
+    background-color: #d86e26;
+    padding: 10px 0px;
+    border: 1px solid white;
+    box-shadow: 0px 2px 3px 3px #00000024;
+
+    li {
+        border-bottom: 1px solid white;
+        padding: 10px 10px 10px 10px;
+
+        &:last-child {
+            border-bottom: 0px;
+            padding: 10px 10px 0px 10px;
+        }
+        &:first-child {
+            padding: 0px 10px 0px 10px;
+        }
+
+        a {
+            color: white;
+        }
+    }
 }
 .btn-dropdown-wrapper .dropdown.active {
     display: block !important;
