@@ -5,6 +5,8 @@
 // Header CSS
 header.global-header {
     background: linear-gradient(-180deg, #000000, #223847);
+    z-index: 9;
+    position: relative;
 
     .header-logo {
         img {

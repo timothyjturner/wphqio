@@ -41,6 +41,8 @@ h2 {
     line-height: 26px;
     border: 2px solid #d86e26;
     display: block;
+    position: relative;
+    cursor: pointer;
 
     img {
         width: 20px;
@@ -91,6 +93,9 @@ a.black-btn {
     border-color: #ffffff;
     text-align: center;
 }
+.btn-dropdown-wrapper {
+    position: relative;
+}
 .btn-dropdown-wrapper .dropdown, .primary-btn .sub-menu {
     display: none;
     position: absolute;
@@ -119,4 +124,15 @@ a.black-btn {
 }
 .btn-dropdown-wrapper .dropdown.active {
     display: block !important;
+}
+.primary-btn ul.sub-menu.active {
+    display: block !important;
+}
+.primary-btn ul.sub-menu.active {
+    left: 0;
+    margin-top: 16px;
+
+    li {
+        margin-right: 0px !important;
+    }
 }
