@@ -32,7 +32,6 @@ h2 {
     background-color: #d86e26;
     color: #fff;
     padding: 15px 30px;
-    border-radius: 35px;
     font-size: 18px;
     font-weight: 600;
     margin-right: 0 !important;
@@ -41,6 +40,7 @@ h2 {
     height: fit-content;
     line-height: 26px;
     border: 2px solid #d86e26;
+    display: block;
 
     img {
         width: 20px;
@@ -57,7 +57,6 @@ a.white-btn {
     background-color: transparent;
     color: #d86e26;
     padding: 15px 30px;
-    border-radius: 35px;
     font-size: 18px;
     font-weight: 600;
     line-height: 26px;
@@ -66,13 +65,13 @@ a.white-btn {
     background-color: #ffffff;
     height: fit-content;
 }
-a.white-btn:hover, .primary-btn:hover {
+a.white-btn:hover, .primary-btn:hover, li.request-btn:hover {
     filter: drop-shadow(1px 2px 6px black);
 }
 a.black-btn {
     color: #223847;
     padding: 15px 30px;
-    border-radius: 35px;
+    border-radius: 12px;
     font-size: 18px;
     font-weight: 600;
     border: 2px solid #223847;
@@ -91,4 +90,10 @@ a.black-btn {
     border-radius: 0;
     border-color: #ffffff;
     text-align: center;
+}
+.btn-dropdown-wrapper .dropdown {
+    display: none;
+}
+.btn-dropdown-wrapper .dropdown.active {
+    display: block !important;
 }

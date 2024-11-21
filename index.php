@@ -12,7 +12,18 @@
 
                 <div class="row">
                     <a class="white-btn" href="#">Request a Quote</a>
-                    <a class="primary-btn" href="#">Get Started <img src="/wp-content/uploads/2024/11/down-arrow.png"></a>
+                    <div class="btn-dropdown-wrapper">
+                        <a class="primary-btn" href="#">Get Started</a>
+
+                        <div class="dropdown">
+                            <ul class="links">
+                                <li><a href="#">Hosting</a></li>
+                                <li><a href="#">Maintenance</a></li>
+                                <li><a href="#">SEO</a></li>
+                                <li><a href="#">Custom Quote</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 img">
@@ -74,7 +85,18 @@
 
                 <div class="row">
                     <a class="white-btn" href="#">Request a Quote</a>
-                    <a class="primary-btn" href="#">Get Started <img src="/wp-content/uploads/2024/11/down-arrow.png"></a>
+                    <div class="btn-dropdown-wrapper">
+                        <a class="primary-btn" href="#">Get Started</a>
+
+                        <div class="dropdown">
+                            <ul class="links">
+                                <li><a href="#">Hosting</a></li>
+                                <li><a href="#">Maintenance</a></li>
+                                <li><a href="#">SEO</a></li>
+                                <li><a href="#">Custom Quote</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
