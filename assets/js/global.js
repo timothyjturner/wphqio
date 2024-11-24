@@ -24,21 +24,23 @@ document.addEventListener('click', function (event) {
 });
 
 document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('primary-btn')) {
+    let button = event.target.closest('.primary-btn');
+    if (button) {
         event.preventDefault();
-        let parentWrapper = event.target.closest('ul#menu-main-menu');
+
+        let parentWrapper = button.closest('ul#menu-main-menu');
 
         if (parentWrapper) {
             let dropdown = parentWrapper.querySelector('.sub-menu');
 
             if (dropdown) {
-                event.target.classList.toggle('active');
+                button.classList.toggle('active');
                 dropdown.classList.toggle('active');
             }
         }
 
         event.stopPropagation();
-    }else {
+    } else {
         document.querySelectorAll('.sub-menu.active').forEach(function (dropdown) {
             dropdown.classList.remove('active');
         });
