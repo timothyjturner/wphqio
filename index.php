@@ -11,7 +11,7 @@
                 </p>
 
                 <div class="row">
-                    <a class="white-btn" href="#">Request a Quote</a>
+                    <a class="white-btn" href="#">Free Consultation</a>
                     <div class="btn-dropdown-wrapper">
                         <a class="primary-btn" href="#">Get Started</a>
 
@@ -84,7 +84,7 @@
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
 
                 <div class="row">
-                    <a class="white-btn" href="#">Request a Quote</a>
+                    <a class="white-btn" href="#">Free Consultation</a>
                     <div class="btn-dropdown-wrapper">
                         <a class="primary-btn" href="#">Get Started</a>
 

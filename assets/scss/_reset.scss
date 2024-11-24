@@ -108,6 +108,7 @@ a.black-btn {
     li {
         border-bottom: 1px solid white;
         padding: 10px 10px 10px 10px;
+        text-align: center;
 
         &:last-child {
             border-bottom: 0px;
@@ -119,6 +120,8 @@ a.black-btn {
 
         a {
             color: white;
+            font-weight: 600;
+            font-size: 18px;
         }
     }
 }

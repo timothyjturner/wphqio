@@ -6,6 +6,15 @@
     <title>WPHQ</title>
 
     <?php wp_head(); ?>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-04G4MEWXLN"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-04G4MEWXLN');
+    </script>
 </head>
 
 <header class="global-header">
