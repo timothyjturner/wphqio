@@ -305,22 +305,43 @@ section.about-offer {
     }
 }
 section.pricing-table {
-    padding: 0px 0px 0px 100px;
+    padding: 0px 0px 100px 0px;
+
+    .row.table-main {
+        gap: 1%;
+        justify-content: center;
+    }
 
     .col-md-4 {
         border: 1px solid #223847;
         border-radius: 16px;
+        width: 32% !important;
+        margin-bottom: 20px;
 
         .pricing-header{
             text-align: center;
             background-color: #223847;
             border-radius: 15px;
             color: white;
-            padding: 30px 20px;
+            padding: 40px 20px 50px 20px;
     
             .icon {
                 svg {
-                    width: 60px;
+                    width: 50px;
+                    height: 50px;
+                }
+            }
+
+            .row {
+                max-width: 170px;
+                margin: 0 auto;
+                align-items: center;
+                margin-bottom: 40px;
+
+                .price {
+                    font-size: 40px;
+                    font-weight: 700;
+                    color: #d86e26;
                 }
             }
         }

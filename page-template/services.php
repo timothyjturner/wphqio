@@ -23,7 +23,7 @@ get_header();
             </div>
 
             <div class="col-md-6">
-                <img src="/wp-content/uploads/2024/11/wphq-hosting-and-maintenance-min-scaled.webp">
+                <img class="w-100" src="/wp-content/uploads/2024/11/wphq-hosting-and-maintenance-min-scaled.webp">
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@ get_header();
 
 <section class="pricing-table">
     <div class="container">
-        <div class="row">
+        <div class="row table-main">
             <div class="col-md-4">
                 <div class="pricing-header">
                     <div class="icon">
@@ -42,13 +42,13 @@ get_header();
 
                     <h3>Hosting Only</h3>
 
-                    <div class="row">
-                        <div class="col-md-6 price">
+                    <div class="pricing-wrap">
+                        <div class="price">
                             $39
                         </div>
 
-                        <div class="col-md-6 per-month">
-                            <p>per<br>
+                        <div class="per-month">
+                            <p>per
                             month</p>
                         </div>
                     </div>
@@ -74,18 +74,17 @@ get_header();
 
                     <h3>Maintenance Only</h3>
 
-                    <div class="row">
-                        <div class="col-md-6 price">
+                    <div class="pricing-wrap">
+                        <div class="price">
                             $69
                         </div>
 
-                        <div class="col-md-6 per-month">
-                            <p>per<br>
-                            month</p>
+                        <div class="per-month">
+                            <p>per month</p>
                         </div>
                     </div>
 
-                    <a class="white-btn" href="#">Select Pricing</a>
+                    <a class="white-btn" href="#">Select Plan</a>
                 </div>
                 <div class="content">
                     <ul>
@@ -107,18 +106,17 @@ get_header();
 
                     <h3>Hosting & Maintenance</h3>
 
-                    <div class="row">
-                        <div class="col-md-6 price">
+                    <div class="pricing-wrap">
+                        <div class="price">
                             $129
                         </div>
 
-                        <div class="col-md-6 per-month">
-                            <p>per<br>
-                            month</p>
+                        <div class="per-month">
+                            <p>per month</p>
                         </div>
                     </div>
 
-                    <a class="white-btn" href="#">Select Pricing</a>
+                    <a class="white-btn" href="#">Select Plan</a>
                 </div>
 
                 <div class="content">
@@ -144,14 +142,13 @@ get_header();
 
                     <h3>Hosting, Maintenance, & More</h3>
 
-                    <div class="row">
-                        <div class="col-md-6 price">
+                    <div class="pricing-wrap">
+                        <div class="price">
                             $299
                         </div>
 
-                        <div class="col-md-6 per-month">
-                            <p>per<br>
-                            month</p>
+                        <div class="per-month">
+                            <p>per month</p>
                         </div>
                     </div>
 
@@ -184,14 +181,13 @@ get_header();
 
                     <h3>Hosting, Maintenance, & Much More</h3>
 
-                    <div class="row">
-                        <div class="col-md-6 price">
+                    <div class="pricing-wrap">
+                        <div class="price">
                             $999
                         </div>
 
-                        <div class="col-md-6 per-month">
-                            <p>per<br>
-                            month</p>
+                        <div class="per-month">
+                            <p>per month</p>
                         </div>
                     </div>
 
