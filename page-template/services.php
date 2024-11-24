@@ -23,7 +23,7 @@ get_header();
             </div>
 
             <div class="col-md-6">
-                <img src="/wp-content/uploads/2024/11/wphq-hosting-and-maintenance-1.png">
+                <img src="/wp-content/uploads/2024/11/wphq-hosting-and-maintenance-min-scaled.webp">
             </div>
         </div>
     </div>
@@ -53,7 +53,7 @@ get_header();
                         </div>
                     </div>
 
-                    <a href="#">Select Plan</a>
+                    <a class="white-btn" href="#">Select Plan</a>
                 </div>
                 <div class="content">
                     <ul>
@@ -85,7 +85,7 @@ get_header();
                         </div>
                     </div>
 
-                    <a href="#">Select Pricing</a>
+                    <a class="white-btn" href="#">Select Pricing</a>
                 </div>
                 <div class="content">
                     <ul>
@@ -118,7 +118,7 @@ get_header();
                         </div>
                     </div>
 
-                    <a href="#">Select Pricing</a>
+                    <a class="white-btn" href="#">Select Pricing</a>
                 </div>
 
                 <div class="content">
@@ -155,7 +155,7 @@ get_header();
                         </div>
                     </div>
 
-                    <a href="#">Select Plan</a>
+                    <a class="white-btn" href="#">Select Plan</a>
                 </div>
 
                 <div class="content">
@@ -195,7 +195,7 @@ get_header();
                         </div>
                     </div>
 
-                    <a href="#">Select Plan</a>
+                    <a class="white-btn" href="#">Select Plan</a>
                 </div>
 
                 <div class="content">
