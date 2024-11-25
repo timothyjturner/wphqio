@@ -317,6 +317,54 @@ section.pricing-table {
         border-radius: 16px;
         width: 32% !important;
         margin-bottom: 20px;
+        position: relative;
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #d86e26;
+            border-radius: 25px;
+            opacity: 0;
+            transition: all 0.5s;
+            transition-delay: 0.2s;
+            z-index: -1;
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #d86e26;
+            border-radius: 25px;
+            opacity: 0;
+            transition: all 0.5s;
+            transition-delay: 0.3s;
+            z-index: -1;
+        }
+
+        &:hover {
+
+            &:before {
+                transform: rotate(5deg);
+                opacity: 1;
+            }
+
+            &:after {
+                transform: rotate(-5deg);
+                opacity: 1;
+            }
+        }
 
         .pricing-header{
             text-align: center;
@@ -324,6 +372,10 @@ section.pricing-table {
             border-radius: 15px;
             color: white;
             padding: 40px 20px 50px 20px;
+
+            h3 {
+                font-size: 28px;
+            }
     
             .icon {
                 svg {
@@ -351,6 +403,20 @@ section.pricing-table {
 
             li {
                 margin-bottom: 10px;
+                padding-left: 20px;
+                position: relative;
+
+                &:before {
+                    content: '';
+                    background-image: url(/wp-content/uploads/2024/11/check.png);
+                    position: absolute;
+                    left: 0;
+                    padding: 8px 8px;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    top: 50%;
+                    transform: translate(0px, -50%);
+                }
             }
         }
     }
