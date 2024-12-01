@@ -296,6 +296,10 @@ section.inner-page-banner {
 section.about-offer {
     padding: 100px 0px;
 
+    .container {
+        max-width: 980px;
+    }
+
     h2  {
         margin-bottom: 20px;
     }

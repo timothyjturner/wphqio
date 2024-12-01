@@ -14,9 +14,19 @@ get_header();
                 </p>
 
                 <div class="row">
-                    <a class="white-btn" href="#">Get Started Hosting</a>
-                    
-                    <a class="primary-btn" href="#">Get Started Maintenance</a>
+                    <a class="white-btn" href="#">Free Consultation</a>
+                    <div class="btn-dropdown-wrapper">
+                        <a class="primary-btn" href="#">Get Started</a>
+
+                        <div class="dropdown">
+                            <ul class="links">
+                                <li><a href="#">Hosting</a></li>
+                                <li><a href="#">Maintenance</a></li>
+                                <li><a href="#">SEO</a></li>
+                                <li><a href="#">Custom Quote</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 img">
