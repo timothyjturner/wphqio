@@ -3,12 +3,25 @@
 get_header();
 ?>
 
-<section class="inner-page-banner">
+<section class="banner">
     <div class="container">
-        <div class="heading">
-            <h1>Effortless Hosting & Maintenance for WordPress</h1>
+        <div class="row align-center">
+            <div class="col-md-6 content">
+                <h1>Effortless Hosting & Maintenance for WordPress</h1>
 
-            <p>Focus on growing your business while we ensure your website stays fast, secure, and always online.</p>
+                <p>
+                    Focus on growing your business while we ensure your website stays fast, secure, and always online.
+                </p>
+
+                <div class="row">
+                    <a class="white-btn" href="#">Get Started Hosting</a>
+                    
+                    <a class="primary-btn" href="#">Get Started Maintenance</a>
+                </div>
+            </div>
+            <div class="col-md-6 img">
+                <img class="w-100" src="/wp-content/uploads/2024/11/wphq-hosting-and-maintenance-min-scaled.webp">
+            </div>
         </div>
     </div>
 </section>
@@ -16,14 +29,10 @@ get_header();
 <section class="about-offer">
     <div class="container">
         <div class="row align-center">
-            <div class="col-md-6">
+            <div class="text-center">
                 <h2>Flexible Hosting and Maintenance Plans for Every Need</h2>
 
                 <p>At WPHQ, we understand that your website is the digital face of your business. Our hosting and maintenance services are designed to provide unparalleled peace of mind. We monitor your site 24/7, handle updates and backups, and ensure robust security against online threats. With us, you'll never have to worry about downtime or vulnerabilities. Our hosting solutions include optimized servers for WordPress, ensuring your site loads quickly and performs at its best. Paired with proactive maintenance, we keep your site running smoothly, leaving you free to focus on growth. Choose WPHQ for a seamless WordPress experience backed by marketing insights and technical expertise.</p>
-            </div>
-
-            <div class="col-md-6">
-                <img class="w-100" src="/wp-content/uploads/2024/11/wphq-hosting-and-maintenance-min-scaled.webp">
             </div>
         </div>
     </div>
@@ -91,7 +100,7 @@ get_header();
                         <li>Monthly Site Audit & Report</li>
                         <li>Monthly Software/Security Updates</li>
                         <li>Monthly Full Site Backups</li>
-                        <li>Critical & Emergency Site Maintenance</li>
+                        <li><b>Critical & Emergency Site Maintenance</b></li>
                     </ul>
                 </div>
             </div>
@@ -127,7 +136,7 @@ get_header();
                         <li>Monthly Software/Security Updates</li>
                         <li>Monthly Site Audit & Report</li>
                         <li>Monthly Full Site Backups</li>
-                        <li>Critical & Emergency Site Maintenance</li>
+                        <li><b>Critical & Emergency Site Maintenance</b></li>
                     </ul>
                 </div>
             </div>
@@ -163,7 +172,7 @@ get_header();
                         <li>Monthly Software/Security Updates</li>
                         <li>Monthly Site Audit & Report</li>
                         <li>DAILY Full Site Backups</li>
-                        <li>Critical & Emergency Site Maintenance</li>
+                        <li><b>Critical & Emergency Site Maintenance</b></li>
                         <li>Dedicated Account Support Agent</li>
                         <li>Monthly Video Consultation with Specialist</li>
                         <li>2 Hrs Monthly Custom Site Development</li>
@@ -202,12 +211,44 @@ get_header();
                         <li>Monthly Software/Security Updates</li>
                         <li>Monthly Site Audit & Report</li>
                         <li>DAILY Full Site Backups</li>
-                        <li>Critical & Emergency Site Maintenance</li>
+                        <li><b>Critical & Emergency Site Maintenance</b></li>
                         <li>Dedicated Account Support Agent</li>
                         <li>Weekly Video Consultation with Specialist</li>
                         <li>8 Hrs Monthly Custom Site Development</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container">
+        <div class="row align-center">
+            <div class="col-md-8">
+                <h2>Ready to Transform Your Website?</h2>
+
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
+
+                <div class="row">
+                    <a class="white-btn" href="#">Free Consultation</a>
+                    <div class="btn-dropdown-wrapper">
+                        <a class="primary-btn" href="#">Get Started</a>
+
+                        <div class="dropdown">
+                            <ul class="links">
+                                <li><a href="#">Hosting</a></li>
+                                <li><a href="#">Maintenance</a></li>
+                                <li><a href="#">SEO</a></li>
+                                <li><a href="#">Custom Quote</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <img class="w-100" src="/wp-content/uploads/2024/11/transform-your-website-min_11zon-1-scaled.webp">
             </div>
         </div>
     </div>

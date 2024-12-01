@@ -296,6 +296,10 @@ section.inner-page-banner {
 section.about-offer {
     padding: 100px 0px;
 
+    h2  {
+        margin-bottom: 20px;
+    }
+
     .row {
         gap: 4%;
 
@@ -330,7 +334,7 @@ section.pricing-table {
             width: 100%;
             height: 100%;
             border: 1px solid #223847;
-            border-radius: 25px;
+            border-radius: 16px;
             opacity: 0;
             transition: all 0.5s;
             transition-delay: 0.2s;
@@ -347,7 +351,7 @@ section.pricing-table {
             width: 100%;
             height: 100%;
             border: 1px solid #223847;
-            border-radius: 25px;
+            border-radius: 16px;
             opacity: 0;
             transition: all 0.5s;
             transition-delay: 0.3s;
