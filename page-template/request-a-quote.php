@@ -6,7 +6,7 @@ get_header();
 <section class="banner">
     <div class="container">
         <div class="row align-center">
-            <div class="col-md-6 content">
+            <div class="col-md-12 content">
                 <h1>Request a Quote</h1>
 
                 <!-- <p>
@@ -29,27 +29,26 @@ get_header();
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 img">
-                <img class="w-100" src="/wp-content/uploads/2024/11/wphq-hosting-and-maintenance-min-scaled.webp">
-            </div>
         </div>
     </div>
 </section>
 
 <section class="form-sect">
     <div class="container">
-        <div class="row">
+        <div class="row align-center">
             <div class="col-md-6 content">
                 <h2>Let’s Build Something Great Together</h2>
 
                 <p>Tell us about your project, and we’ll provide a tailored quote to bring your vision to life.</p>
             </div>
 
-            <div class="col-md-6 form">
-                <h3>Get Your Free Custom Quote</h3>
+            <div class="col-md-6">
+                <div class="form">
+                    <h3>Get Your Free Custom Quote</h3>
 
-                <div class="form-wrapper">
-                    <?php echo do_shortcode('[wpforms id="94" title="false"]'); ?>
+                    <div class="form-wrapper">
+                        <?php echo do_shortcode('[wpforms id="94" title="false"]'); ?>
+                    </div>
                 </div>
             </div>
         </div>

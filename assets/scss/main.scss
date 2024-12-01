@@ -321,7 +321,7 @@ section.pricing-table {
     }
 
     .col-md-4 {
-        border: 1px solid #223847;
+        border: 1px solid $primary-color;
         border-radius: 16px;
         width: 32% !important;
         margin-bottom: 20px;
@@ -354,7 +354,7 @@ section.pricing-table {
             right: 0;
             width: 100%;
             height: 100%;
-            border: 1px solid #223847;
+            border: 1px solid $primary-color;
             border-radius: 16px;
             opacity: 0;
             transition: all 0.5s;
@@ -433,10 +433,105 @@ section.pricing-table {
 
 // who we are page
 section.simple-content {
-    padding: 70px 0px 0px 0px;
+    padding: 100px 0px 0px 0px;
     text-align: center;
 
     p {
         font-size: 18px;
+    }
+}
+
+// Request a Quote Page
+section.form-sect {
+    padding: 100px 0px 0px 0px;
+
+    .form {
+        background-color: $accent-color;
+        border-radius: 25px;
+        padding: 40px 30px;
+        position: relative;
+
+        h3 {
+            color: $white;
+            font-size: 30px;
+        }
+
+        .form-wrapper {
+            .wpforms-container {
+                margin-top: 10px;
+            }
+
+            input {
+                border: 0px !important;
+            }
+
+            button.wpforms-submit {
+                background-color: $secondary-color !important;
+                color: $white !important;
+                padding: 10px 30px !important;
+                font-size: 18px !important;
+                font-weight: 600 !important;
+                margin-right: 0 !important;
+                height: fit-content !important;
+                line-height: 26px !important;
+                border: 2px solid $secondary-color !important;
+                display: block;
+                position: relative !important;
+                cursor: pointer !important;
+                border-radius: 12px !important;
+
+                &:hover {
+                    background: $secondary-color !important;
+                    filter: drop-shadow(1px 2px 6px $black);
+                }
+            }
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid $accent-color;
+            border-radius: 25px;
+            opacity: 0;
+            transition: all 0.5s;
+            transition-delay: 0.3s;
+            z-index: -1;
+        }
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid $accent-color;
+            border-radius: 25px;
+            opacity: 0;
+            transition: all 0.5s;
+            transition-delay: 0.2s;
+            z-index: -1;
+        }
+
+        &:hover {
+
+            &:before {
+                transform: rotate(5deg);
+                opacity: 1;
+            }
+
+            &:after {
+                transform: rotate(-5deg);
+                opacity: 1;
+            }
+        }
     }
 }
