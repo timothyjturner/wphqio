@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WPHQ</title>
+    <title>
+        <?php
+            bloginfo('name');
+            if (wp_title('', false)) {
+                echo '|';
+            } else {
+                echo bloginfo('description');
+            } wp_title('');
+        ?>
+    </title>
 
     <?php wp_head(); ?>
 
@@ -21,7 +30,7 @@
     <div class="container">
         <div class="row align-center">
             <div class="header-logo col-md-3">
-                <img src="/wp-content/uploads/2024/11/wphq-logo.png">
+                <a href="/"><img src="/wp-content/uploads/2024/11/wphq-logo.png"></a>
             </div>
 
             <div class="header-nav col-md-9">
