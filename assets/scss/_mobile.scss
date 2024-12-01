@@ -37,7 +37,7 @@
             }
 
             .content {
-                padding-right: 0px;
+                padding-right: 0px !important;
             }
 
             p {
@@ -53,6 +53,25 @@
             .col-md-4.card {
                 width: 100%;
                 margin-bottom: 15px;
+            }
+        }
+    }
+
+    section.cta {
+        padding: 50px 0;
+
+        .row {
+            padding: 40px 10px;
+            flex-direction: column-reverse;
+
+            .col-md-8 {
+                padding-right: 0px;
+                width: 100%;
+            }
+
+            .col-md-4 {
+                width: 100%;
+                margin-bottom: 20px;
             }
         }
     }
