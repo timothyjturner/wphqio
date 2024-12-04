@@ -3,36 +3,6 @@
 get_header();
 ?>
 
-<section class="banner">
-    <div class="container">
-        <div class="row align-center">
-            <div class="col-md-12 content">
-                <h1>Request a Quote</h1>
-
-                <!-- <p>
-                    Focus on growing your business while we ensure your website stays fast, secure, and always online.
-                </p> -->
-
-                <div class="row">
-                    <a class="white-btn" href="#">Free Consultation</a>
-                    <div class="btn-dropdown-wrapper">
-                        <a class="primary-btn" href="#">Get Started</a>
-
-                        <div class="dropdown">
-                            <ul class="links">
-                                <li><a href="#">Hosting</a></li>
-                                <li><a href="#">Maintenance</a></li>
-                                <li><a href="#">SEO</a></li>
-                                <li><a href="#">Custom Quote</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
 <section class="form-sect">
     <div class="container">
         <div class="row align-center">
