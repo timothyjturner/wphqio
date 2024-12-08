@@ -1,8 +1,10 @@
-<footer class="global-footer">
+<?php $footer = get_field('footer'); ?>
+
+<footer class="global-footer" style="background-color: <?=$footer['background_color']?>;">
     <div class="container">
         <div class="row">
             <div class="col-md-4">
-                <img class="footer-logo" src="/wp-content/uploads/2024/11/wphq-logo.png">
+                <img class="footer-logo" src="<?=$footer['logo']['url']?>">
             </div>
 
             <div class="col-md-4">
@@ -14,15 +16,20 @@
             </div>
 
             <div class="col-md-4">
-                <h3>Questions?</h3>
-                <a href="mailto:admin@wphq.io">Contact Us: admin@wphq.io</a>
+                <?php if($footer['email']['title']): ?>
+                    <h3><?=$footer['email']['title']?></h3>
+                <?php endif; ?>
+
+                <a href="mailto:<?=$footer['email']['email']?>">Contact Us: <?=$footer['email']['email']?></a>
             </div>
         </div>
     </div>
 
-    <div class="copyright text-center">
-        Copyright © 2024 WPHQ.
-    </div>
+    <?php if($footer['copyright_text']): ?>
+        <div class="copyright text-center">
+            <?php echo do_shortcode($footer['copyright_text']); ?>
+        </div>
+    <?php endif; ?>
 </footer>
 
 <?php wp_footer(); ?>

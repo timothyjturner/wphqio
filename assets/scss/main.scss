@@ -35,16 +35,16 @@ header.global-header {
         }
 
         li.request-btn {
-            background-color: #fff;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 12px;
-            border: 2px solid #d86e26;
             margin-right: 0px !important;
 
             a {
                 color: #d86e26 !important;
+                background-color: #fff;
+                padding: 18px 30px;
+                font-size: 18px;
+                font-weight: 600;
+                border-radius: 12px;
+                border: 2px solid #d86e26;
             }
         }
     }

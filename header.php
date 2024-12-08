@@ -26,11 +26,13 @@
     </script>
 </head>
 
+<?php $header = get_field('header'); ?>
+
 <header class="global-header">
     <div class="container">
         <div class="row align-center">
             <div class="header-logo col-md-3">
-                <a href="/"><img src="/wp-content/uploads/2024/11/wphq-logo.png"></a>
+                <a href="/"><img src="<?=$header['logo']['url']?>"></a>
             </div>
 
             <div class="header-nav col-md-9">

@@ -2,38 +2,59 @@
 //Template Name: Global Sections
 get_header(); ?>
 
-<section class="banner">
-    <div class="container">
-        <div class="row align-center">
-            <div class="col-md-6 content">
-                <h1>Elevate Your WordPress Website with Proven Marketing Expertise</h1>
+<?php 
+    $hide_banner = get_field('hide_banner'); 
+    $banner = get_field('banner');
+?>
 
-                <p>
-                    Your website deserves more than generic solutions. At WPHQ, we specialize in WordPress hosting, maintenance, and SEO services designed to drive results. Let us handle the technical side, so you can focus on growing your business.
-                </p>
+<?php if(!$hide_banner): ?>
+    <section class="banner" style="background-color: <?=$banner['background_color']?>;">
+        <div class="container">
+            <div class="row align-center">
+                <div class="<?php if($banner['image']){ echo 'col-md-6'; }else { echo 'col-md-12 text-center'; } ?> content">
+                    <?php if($banner['title']): ?>
+                        <h1><?=$banner['title']?></h1>
+                    <?php endif; ?>
 
-                <div class="row">
-                    <a class="white-btn" href="#">Free Consultation</a>
-                    <div class="btn-dropdown-wrapper">
-                        <a class="primary-btn" href="#">Get Started</a>
+                    <?=$banner['content']?>
 
-                        <div class="dropdown">
-                            <ul class="links">
-                                <li><a href="#">Hosting</a></li>
-                                <li><a href="#">Maintenance</a></li>
-                                <li><a href="#">SEO</a></li>
-                                <li><a href="#">Custom Quote</a></li>
-                            </ul>
-                        </div>
+                    <div class="row <?php if(!$banner['image']){ echo 'justify-center'; }?>">
+                        <?php if($banner['buttons']): ?>
+                            <?php foreach($banner['buttons']['title'] as $key => $buttons): ?>
+                                <?php if ($buttons['button']['title'] == 'Get Started'){
+                                    ?>
+                                        <div class="btn-dropdown-wrapper">
+                                            <a class="primary-btn" href="#"><?=$buttons['button']['title']?></a>
+
+                                            <div class="dropdown">
+                                                <ul class="links">
+                                                    <li><a href="#">Hosting</a></li>
+                                                    <li><a href="#">Maintenance</a></li>
+                                                    <li><a href="#">SEO</a></li>
+                                                    <li><a href="#">Custom Quote</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    <?php
+                                }else {
+                                    ?>
+                                        <a class="white-btn" href="<?=$buttons['button']['url']?>"><?=$buttons['button']['title']?></a>
+                                    <?php
+                                } ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 img">
-                <img class="w-100" src="/wp-content/uploads/2024/11/home-hero-min-scaled.webp">
+                
+                <?php if($banner['image']): ?>
+                    <div class="col-md-6 img">
+                        <img class="w-100" src="<?=$banner['image']?>">
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+<?php endif; ?>
 
 <section class="solutions-sect">
     <div class="container">
