@@ -30,3 +30,10 @@ if( function_exists('acf_add_options_page') ) {
   ));
 
 }
+
+function current_year_func() {
+  $current_year = date('Y');
+
+  return $current_year;
+}
+add_shortcode( 'year', 'current_year_func' );
