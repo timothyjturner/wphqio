@@ -1,4 +1,4 @@
-<?php $footer = get_field('footer'); ?>
+<?php $footer = get_field('footer', 'option'); ?>
 
 <footer class="global-footer" style="background-color: <?=$footer['background_color']?>;">
     <div class="container">

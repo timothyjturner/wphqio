@@ -20,7 +20,7 @@ get_header(); ?>
 
                     <div class="row <?php if(!$banner['image']){ echo 'justify-center'; }?>">
                         <?php if($banner['buttons']): ?>
-                            <?php foreach($banner['buttons']['title'] as $key => $buttons): ?>
+                            <?php foreach($banner['buttons'] as $key => $buttons): ?>
                                 <?php if ($buttons['button']['title'] == 'Get Started'){
                                     ?>
                                         <div class="btn-dropdown-wrapper">
@@ -48,7 +48,7 @@ get_header(); ?>
                 
                 <?php if($banner['image']): ?>
                     <div class="col-md-6 img">
-                        <img class="w-100" src="<?=$banner['image']?>">
+                        <img class="w-100" src="<?=$banner['image']['url']?>">
                     </div>
                 <?php endif; ?>
             </div>

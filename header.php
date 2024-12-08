@@ -26,7 +26,7 @@
     </script>
 </head>
 
-<?php $header = get_field('header'); ?>
+<?php $header = get_field('header', 'option'); ?>
 
 <header class="global-header">
     <div class="container">
