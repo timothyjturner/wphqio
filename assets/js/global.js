@@ -1,5 +1,5 @@
 document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('primary-btn')) {
+    if (event.target.classList.contains('primary-btn > a')) {
         event.preventDefault();
         let parentWrapper = event.target.closest('.btn-dropdown-wrapper');
 
@@ -24,7 +24,7 @@ document.addEventListener('click', function (event) {
 });
 
 document.addEventListener('click', function (event) {
-    let button = event.target.closest('.primary-btn');
+    let button = event.target.closest('.primary-btn > a');
     if (button) {
         event.preventDefault();
 
