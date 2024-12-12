@@ -56,78 +56,90 @@ get_header(); ?>
     </section>
 <?php endif; ?>
 
-<section class="solutions-sect">
-    <div class="container">
-        <h2 class="text-center">Solutions</h2>
+<?php
 
-        <div class="row">
-            <div class="col-md-4 card">
-                <div class="inner">
-                    <img src="/wp-content/uploads/2024/11/server.png">
+if( have_rows('sections') ):
+    while ( have_rows('sections') ) : the_row();
+        if( get_row_layout() == 'solutions' ):
+            $title = get_sub_field('title');
+            $tiles = get_sub_field('tiles'); ?>
 
-                    <h3>Reliable Hosting & Hassle-Free Maintenance</h3>
+            <section class="solutions-sect">
+                <div class="container">
+                    <?php if($title): ?>
+                        <h2 class="text-center"><?=$title?></h2>
+                    <?php endif; ?>
+                    
+                    <?php if($tiles): ?>
+                        <div class="row">
+                            <?php foreach($tiles as $tile): ?>
+                                <div class="col-md-4 card">
+                                    <div class="inner">
+                                        <img src="<?=$tile['icon']['url']?>">
 
-                    <p>Keep your WordPress site secure, fast, and up-to-date with our managed hosting and maintenance plans.</p>
+                                        <h3><?=$tile['title']?></h3>
 
-                    <a class="link underline" href="#">Learn More</a>
+                                        <?=$tile['content']?>
+                                        
+                                        <?php if($tile['cta']): ?>
+                                            <a class="link underline" href="<?=$tile['cta']['url']?>"><?=$tile['cta']['title']?></a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
-            </div>
-            <div class="col-md-4 card">
-                <div class="inner">
-                    <img src="/wp-content/uploads/2024/11/performance.png">
+            </section>
 
-                    <h3>SEO Services That Deliver Results</h3>
+        <?php elseif( get_row_layout() == 'global_cta' ): 
+            $global_cta = get_field('global_cta', 'option'); ?>
 
-                    <p>Take the guesswork out of search engine optimization. Our tailored strategies improve rankings, boost traffic, and drive leads.</p>
+            <section class="cta" style="background-color: <?=$global_cta['background_color']?>">
+                <div class="container">
+                    <div class="row align-center">
+                        <div class="col-md-8">
+                            <h2><?=$global_cta['title']?></h2>
 
-                    <a class="link underline" href="#">Learn More</a>
-                </div>
-            </div>
-            <div class="col-md-4 card">
-                <div class="inner">
-                    <img src="/wp-content/uploads/2024/11/coding.png">
+                            <?=$global_cta['description']?>
 
-                    <h3>Bring Your Vision to Life</h3>
+                            <div class="row">
+                                <?php if($global_cta['buttons']): ?>
+                                    <?php foreach($global_cta['buttons'] as $key => $button): ?>
+                                        <?php if ($button['button']['title'] == 'Get Started'){
+                                            ?>
+                                                <div class="btn-dropdown-wrapper">
+                                                    <a class="primary-btn" href="#"><?=$button['button']['title']?></a>
 
-                    <p>Need something unique? Our custom development services are designed to create powerful WordPress websites tailored to your exact needs.</p>
+                                                    <div class="dropdown">
+                                                        <ul class="links">
+                                                            <li><a href="#">Hosting</a></li>
+                                                            <li><a href="#">Maintenance</a></li>
+                                                            <li><a href="#">SEO</a></li>
+                                                            <li><a href="#">Custom Quote</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            <?php
+                                        }else {
+                                            ?>
+                                                <a class="white-btn" href="<?=$button['button']['url']?>"><?=$button['button']['title']?></a>
+                                            <?php
+                                        } ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
 
-                    <a class="link underline" href="#">Learn More</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="cta">
-    <div class="container">
-        <div class="row align-center">
-            <div class="col-md-8">
-                <h2>Ready to Transform Your Website?</h2>
-
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
-
-                <div class="row">
-                    <a class="white-btn" href="#">Free Consultation</a>
-                    <div class="btn-dropdown-wrapper">
-                        <a class="primary-btn" href="#">Get Started</a>
-
-                        <div class="dropdown">
-                            <ul class="links">
-                                <li><a href="#">Hosting</a></li>
-                                <li><a href="#">Maintenance</a></li>
-                                <li><a href="#">SEO</a></li>
-                                <li><a href="#">Custom Quote</a></li>
-                            </ul>
+                        <div class="col-md-4">
+                            <img class="w-100" src="<?=$global_cta['image']['url']?>">
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="col-md-4">
-                <img class="w-100" src="/wp-content/uploads/2024/11/transform-your-website-min_11zon-1-scaled.webp">
-            </div>
-        </div>
-    </div>
-</section>
+        <?php endif;
+    endwhile;
+endif; ?>
 
 <?php get_footer(); ?>
