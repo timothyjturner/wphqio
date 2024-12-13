@@ -26,6 +26,8 @@
     </script>
 </head>
 
+<body <?php body_class(); ?>>
+
 <?php $header = get_field('header', 'option'); ?>
 
 <header class="global-header">
@@ -45,4 +47,3 @@
         </div>
     </div>
 </header>
-<body>
