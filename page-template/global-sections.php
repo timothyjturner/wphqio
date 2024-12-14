@@ -145,7 +145,7 @@ if( have_rows('sections') ):
 
             <section class="simple-content">
                 <div class="container">
-                    <div class="row <?php if($text_alignment == 'center'){ echo 'text-center'; } ?>">
+                    <div class="<?php if($text_alignment == 'center'){ echo 'text-center'; } ?>">
                         <?php if($title): ?>
                             <h2><?=$title?></h2>
                         <?php endif; ?>
@@ -213,7 +213,7 @@ if( have_rows('sections') ):
 
                                     <div class="pricing-wrap">
                                         <div class="price">
-                                            <?=$_product->get_price()?>
+                                            $<?=$_product->get_price()?>
                                         </div>
 
                                         <div class="per-month">
