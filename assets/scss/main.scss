@@ -18,12 +18,14 @@ header.global-header {
 
     .header-nav {
         .hamburger {
+            display: none;
             position: relative;
             width: 1em;
             height: 1em;
             font-size: inherit;
             transition: all 0.3s ease;
             cursor: pointer;
+            float: right;
           
             &.is-lg {
               font-size: 2rem;
@@ -35,41 +37,35 @@ header.global-header {
                 width: 100%;
                 height: 0.125em;
                 border-radius: 0.125em;
-                background: currentColor;
+                background: $white;
                 transition: inherit;
           
                 &:nth-child(1) {
                     top: 0.125em;
-          
-                    .hamburger.is-active &,
-                    .w-nav-button.w--open & {
-                        top: 50%;
-                        transform: translateY(-50%) rotateZ(-135deg);
-                    }
                 }
           
                 &:nth-child(2) {
                     top: 0.438em;
-            
-                    .hamburger.is-active &,
-                    .w-nav-button.w--open & {
-                    right: 50%;
-                    width: 0;
-                    }
                 }
             
                 &:nth-child(3) {
                     top: 0.75em;
                     width: 0.625em;
-            
-                    .hamburger.is-active &,
-                    .w-nav-button.w--open & {
-                    top: 50%;
-                    width: 100%;
-                    transform: translateY(-50%) rotateZ(135deg);
-                    }
                 }
             }
+        }
+        .hamburger.is-active .hamburger-line:nth-child(1), .w-nav-button.w--open .hamburger-line:nth-child(1) {
+            top: 50%;
+            transform: translateY(-50%) rotateZ(-135deg);
+        }
+        .hamburger.is-active .hamburger-line:nth-child(2), .w-nav-button.w--open .hamburger-line:nth-child(2) {
+            right: 50%;
+            width: 0;
+        }
+        .hamburger.is-active .hamburger-line:nth-child(3), .w-nav-button.w--open .hamburger-line:nth-child(3) {
+            top: 50%;
+            width: 100%;
+            transform: translateY(-50%) rotateZ(135deg);
         }
     }
 }
