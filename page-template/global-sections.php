@@ -222,7 +222,7 @@ if( have_rows('sections') ):
                                         </div>
                                     </div>
 
-                                    <a class="white-btn" href="#">Select Plan</a>
+                                    <a class="white-btn" href="/cart/?add-to-cart=<?=$product->ID?>&quantity=1">Select Plan</a>
                                 </div>
                                 <div class="content">
                                     <?php if($points): ?>

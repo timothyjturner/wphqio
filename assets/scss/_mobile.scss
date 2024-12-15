@@ -9,6 +9,10 @@
         line-height: 45px;
     }
 
+    .col-md-4 {
+        width: 100%;
+    }
+
     a.white-btn, .primary-btn {
         padding: 10px 20px;
         font-size: 16px;
@@ -18,7 +22,7 @@
     .global-header {
         .header-logo {
             img {
-                max-width: 90px;
+                max-width: 80px;
             }
         }
         .main-menu {
@@ -27,7 +31,7 @@
     }
 
     section.banner {
-        padding: 60px 0;
+        padding: 60px 0 !important;
         text-align: center;
 
         .row {
@@ -39,6 +43,7 @@
 
             .content {
                 padding-right: 0px !important;
+                margin-top: 20px;
             }
 
             p {
@@ -59,21 +64,39 @@
     }
 
     section.cta {
-        padding: 50px 0;
+        padding: 50px 0 !important;
 
         .row {
             padding: 40px 10px !important;
             flex-direction: column-reverse;
+            margin-top: 0px !important;
 
             .col-md-8 {
                 padding-right: 0px !important;
                 width: 100%;
+
+                .row {
+                    padding-bottom: 0px !important;
+                }
             }
 
             .col-md-4 {
                 width: 100%;
                 margin-bottom: 20px;
             }
+
+        }
+    }
+
+    section.simple-content {
+        padding: 50px 0 50px 0 !important;
+    }
+
+    footer.global-footer {
+        padding-top: 60px !important;
+
+        .row {
+            padding-bottom: 50px !important;
         }
     }
 }
