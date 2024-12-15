@@ -39,6 +39,12 @@
 
             <div class="header-nav col-md-9">
                 <div class="nav-wrapper">
+                    <div class="hamburger is-lg">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </div>
+                    
                     <?php 	
                         wp_nav_menu( array( 'theme_location'=>'main-menu', 'container_class'=>'main-menu' ) ); 
                     ?>

@@ -22,7 +22,7 @@
     .global-header {
         .header-logo {
             img {
-                max-width: 80px;
+                max-width: 80px !important;
             }
         }
         .main-menu {
@@ -101,8 +101,10 @@
     footer.global-footer {
         padding-top: 60px !important;
 
-        .row {
-            padding-bottom: 50px !important;
+        .table-main {
+            .row {
+                padding-bottom: 50px !important;
+            }   
         }
     }
 

@@ -49,3 +49,9 @@ document.addEventListener('click', function (event) {
         });
     }
 });
+
+document.querySelectorAll(".hamburger").forEach((element) => {
+    element.addEventListener("click", (event) => {
+        element.classList.toggle("is-active");
+    });
+});
