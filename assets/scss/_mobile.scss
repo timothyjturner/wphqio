@@ -1,12 +1,12 @@
 @media (max-width: 767px){
     h1 {
-        font-size: 40px;
-        line-height: 55px;
+        font-size: 40px !important;
+        line-height: 55px !important;
     }
 
     h2 {
-        font-size: 35px;
-        line-height: 45px;
+        font-size: 35px !important;
+        line-height: 45px !important;
     }
 
     .col-md-4 {
@@ -17,6 +17,27 @@
         padding: 10px 20px;
         font-size: 16px;
         text-align: center;
+    }
+
+    .primary-btn.active, .primary-btn>a.active {
+        text-align: left !important;
+        filter: unset !important;
+    }
+
+    .btn-dropdown-wrapper .dropdown, .primary-btn .sub-menu {
+        background-color: #d86e2600 !important;
+        border: 0px !important;
+        box-shadow: unset !important;
+        position: static !important;
+    }
+    .btn-dropdown-wrapper .dropdown li, .primary-btn .sub-menu li {
+        text-align: left !important;
+
+        a {
+            font-weight: 400 !important;
+            display: block !important;
+            padding: 0px 10px !important;
+        }
     }
     
     .global-header {
@@ -31,12 +52,18 @@
             top: 90px;
             width: 100%;
             left: 0;
-            padding: 20px;
+            padding: 0px;
+            height: calc(100vh - 91px);
 
             ul#menu-main-menu {
                 display: block;
                 padding: 30px 20px;
                 background-color: white;
+                height: 100%;
+
+                li.menu-item {
+                    margin-bottom: 10px;
+                }
 
                 li.menu-item a {
                     color: #000000 !important;
@@ -87,7 +114,7 @@
     }
 
     section.solutions-sect {
-        padding: 50px 0 0 0;
+        padding: 50px 0 0 0 !important;
 
         .row {
             .col-md-4.card {
@@ -127,8 +154,10 @@
     }
 
     section.pricing-table {
-        .col-md-4 {
-            width: 100% !important;
+        .table-main {
+            .col-md-4 {
+                width: 100% !important;
+            }
         }
     }
 
@@ -139,6 +168,18 @@
             .row {
                 padding-bottom: 50px !important;
             }   
+        }
+    }
+
+    section.form-sect {
+        padding: 50px 0 0 0 !important;
+        
+        .col-md-6 {
+            width: 100% !important;
+
+            &.content {
+                margin-bottom: 20px;
+            }
         }
     }
 
