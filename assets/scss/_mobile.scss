@@ -10,7 +10,7 @@
     }
 
     .col-md-4 {
-        width: 100%;
+        width: 100% !important;
     }
 
     a.white-btn, .primary-btn {
@@ -92,6 +92,12 @@
         padding: 50px 0 50px 0 !important;
     }
 
+    section.pricing-table {
+        .col-md-4 {
+            width: 100% !important;
+        }
+    }
+
     footer.global-footer {
         padding-top: 60px !important;
 
@@ -99,4 +105,5 @@
             padding-bottom: 50px !important;
         }
     }
+
 }

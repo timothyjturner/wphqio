@@ -221,8 +221,9 @@ if( have_rows('sections') ):
                                             month</p>
                                         </div>
                                     </div>
-
-                                    <a class="white-btn" href="/cart/?add-to-cart=<?=$product->ID?>&quantity=1">Select Plan</a>
+                                    
+                                    <a href="/?wc-ajax=add_to_cart?add-to-cart=<?=$product->ID?>" data-quantity="1" class="white-btn product_type_variable add_to_cart_button ajax_add_to_cart ad_quick_add_to_cart_listing" data-product_id="<?=$product->ID?>" rel="nofollow">Select Plan</a>
+                                    
                                 </div>
                                 <div class="content">
                                     <?php if($points): ?>
