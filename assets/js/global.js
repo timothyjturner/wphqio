@@ -17,7 +17,7 @@ document.addEventListener('click', function (event) {
         document.querySelectorAll('.dropdown.active').forEach(function (dropdown) {
             dropdown.classList.remove('active');
         });
-        document.querySelectorAll('.primary-btn > a.active').forEach(function (button) {
+        document.querySelectorAll('.primary-btn.active').forEach(function (button) {
             button.classList.remove('active');
         });
     }

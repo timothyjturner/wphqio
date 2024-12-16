@@ -29,6 +29,7 @@
         border: 0px !important;
         box-shadow: unset !important;
         position: static !important;
+        margin-top: 10px !important;
     }
     .btn-dropdown-wrapper .dropdown li, .primary-btn .sub-menu li {
         text-align: left !important;
@@ -172,7 +173,7 @@
     }
 
     section.form-sect {
-        padding: 50px 0 0 0 !important;
+        padding: 50px 0 50px 0 !important;
         
         .col-md-6 {
             width: 100% !important;

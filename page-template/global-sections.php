@@ -22,16 +22,16 @@ get_header(); ?>
                         <?php if($banner['buttons']): ?>
                             <?php foreach($banner['buttons'] as $key => $buttons): ?>
                                 <?php if ($buttons['button']['title'] == 'Get Started'){
+                                    $global_button_links = get_field('global_button_links', 'option');
                                     ?>
                                         <div class="btn-dropdown-wrapper">
                                             <a class="primary-btn" href="#"><?=$buttons['button']['title']?></a>
 
                                             <div class="dropdown">
                                                 <ul class="links">
-                                                    <li><a href="#">Hosting</a></li>
-                                                    <li><a href="#">Maintenance</a></li>
-                                                    <li><a href="#">SEO</a></li>
-                                                    <li><a href="#">Custom Quote</a></li>
+                                                    <?php foreach($global_button_links as $global_links): ?>
+                                                        <li><a href="<?=$global_links['link']['url']?>"><?=$global_links['link']['title']?></a></li>
+                                                    <?php endforeach; ?>
                                                 </ul>
                                             </div>
                                         </div>
@@ -107,16 +107,16 @@ if( have_rows('sections') ):
                                 <?php if($global_cta['buttons']): ?>
                                     <?php foreach($global_cta['buttons'] as $key => $button): ?>
                                         <?php if ($button['button']['title'] == 'Get Started'){
+                                            $global_button_links = get_field('global_button_links', 'option');
                                             ?>
                                                 <div class="btn-dropdown-wrapper">
-                                                    <a class="primary-btn" href="#"><?=$button['button']['title']?></a>
-
+                                                    <a class="primary-btn" href="#"><?=$buttons['button']['title']?></a>
+        
                                                     <div class="dropdown">
                                                         <ul class="links">
-                                                            <li><a href="#">Hosting</a></li>
-                                                            <li><a href="#">Maintenance</a></li>
-                                                            <li><a href="#">SEO</a></li>
-                                                            <li><a href="#">Custom Quote</a></li>
+                                                            <?php foreach($global_button_links as $global_links): ?>
+                                                                <li><a href="<?=$global_links['link']['url']?>"><?=$global_links['link']['title']?></a></li>
+                                                            <?php endforeach; ?>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -221,7 +221,7 @@ if( have_rows('sections') ):
                                             month</p>
                                         </div>
                                     </div>
-                                    
+
                                     <a href="/?wc-ajax=add_to_cart?add-to-cart=<?=$product->ID?>" data-quantity="1" class="white-btn product_type_variable add_to_cart_button ajax_add_to_cart ad_quick_add_to_cart_listing" data-product_id="<?=$product->ID?>" rel="nofollow">Select Plan</a>
                                     
                                 </div>
