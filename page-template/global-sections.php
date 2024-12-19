@@ -64,7 +64,7 @@ if( have_rows('sections') ):
             $title = get_sub_field('title');
             $tiles = get_sub_field('tiles'); ?>
 
-            <section class="solutions-sect">
+            <section id="solutions" class="solutions-sect">
                 <div class="container">
                     <?php if($title): ?>
                         <h2 class="text-center"><?=$title?></h2>
@@ -95,7 +95,7 @@ if( have_rows('sections') ):
         <?php elseif( get_row_layout() == 'global_cta' ): 
             $global_cta = get_field('global_cta', 'option'); ?>
 
-            <section class="cta">
+            <section id="global-cta" class="cta">
                 <div class="container">
                     <div class="row align-center" style="background-color: <?=$global_cta['background_color']?>">
                         <div class="col-md-8">
@@ -143,7 +143,7 @@ if( have_rows('sections') ):
             $title = get_sub_field('title');
             $content = get_sub_field('content'); ?>
 
-            <section class="simple-content">
+            <section id="simple-content" class="simple-content">
                 <div class="container">
                     <div class="<?php if($text_alignment == 'center'){ echo 'text-center'; } ?>">
                         <?php if($title): ?>
@@ -159,7 +159,7 @@ if( have_rows('sections') ):
             $content = get_sub_field('content');
             $form = get_sub_field('form'); ?>
 
-            <section class="form-sect">
+            <section id="form" class="form-sect">
                 <div class="container">
                     <div class="row align-center">
                         <div class="col-md-6 content">
@@ -190,7 +190,7 @@ if( have_rows('sections') ):
         <?php elseif( get_row_layout() == 'pricing_table' ):
             $products = get_sub_field('products'); ?>
 
-            <section class="pricing-table">
+            <section id="pricing-table" class="pricing-table">
                 <div class="container">
                     <div class="row table-main">
                         <?php foreach($products as $product): 
