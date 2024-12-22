@@ -595,6 +595,29 @@ section.form-sect {
         }
     }
 }
+.woocommerce-dashboard {
+    .woocommerce {
+        max-width: 1340px;
+        padding: 60px 20px;
+        margin: 0 auto;
+
+        a {
+            color: $secondary-color;
+        }
+
+        .woocommerce-MyAccount-navigation-link.is-active {
+            a {
+                padding: 10px 40px;
+                display: block;
+                background-color: #d86e26;
+                color: white;
+                width: fit-content;
+                margin-bottom: 5px;
+                border-radius: 5px;
+            }
+        }
+    }
+}
 
 a.added_to_cart.wc-forward {
     display: none;
