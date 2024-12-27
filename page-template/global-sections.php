@@ -95,7 +95,7 @@ if( have_rows('sections') ):
         <?php elseif( get_row_layout() == 'global_cta' ): 
             $global_cta = get_field('global_cta', 'option'); ?>
 
-            <section id="global-cta" class="cta">
+            <section id="global-cta" class="cta" data-aos="fade-up" data-aos-anchor-placement="center-bottom">
                 <div class="container">
                     <div class="row align-center" style="background-color: <?=$global_cta['background_color']?>">
                         <div class="col-md-8">
