@@ -34,5 +34,7 @@
 
 <?php wp_footer(); ?>
 
+<script type="module" src="<?php echo get_template_directory_uri() . '/assets/js/cursor.js' ?>"></script>
+
 </body>
 </html>

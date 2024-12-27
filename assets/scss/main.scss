@@ -22,13 +22,13 @@
         &--small {
             width: 10px;
             height: 10px;
-            background-color: var(--color-white);
+            background-color: $white;
         }
 
         &--large {
             width: 40px;
             height: 40px;
-            border: 2px solid var(--color-red);
+            border: 2px solid $secondary-color;
         }
 
     }
