@@ -30,6 +30,13 @@
 
 <?php $header = get_field('header', 'option'); ?>
 
+<!-- Cursor -->
+<div class="cursor">
+	<div class="cursor__circle cursor__circle--small"></div>
+	<div class="cursor__circle cursor__circle--large"></div>
+</div>
+<!-- End Cursor -->
+
 <header class="global-header">
     <div class="container">
         <div class="row align-center">
