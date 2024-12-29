@@ -11,7 +11,7 @@ get_header(); ?>
     <section class="banner" style="background-color: <?=$banner['background_color']?>;">
         <div class="container">
             <div class="row align-center">
-                <div class="<?php if($banner['image']){ echo 'col-md-6'; }else { echo 'col-md-12 text-center'; } ?> content">
+                <div class="<?php if($banner['image']){ echo 'col-md-6'; }else { echo 'col-md-12 text-center'; } ?> content" data-aos="fade-up" data-aos-delay="200" data-aos-duration="500">
                     <?php if($banner['title']): ?>
                         <h1><?=$banner['title']?></h1>
                     <?php endif; ?>
@@ -47,7 +47,7 @@ get_header(); ?>
                 </div>
                 
                 <?php if($banner['image']): ?>
-                    <div class="col-md-6 img">
+                    <div class="col-md-6 img" data-aos="fade-up" data-aos-delay="200" data-aos-duration="500">
                         <img class="w-100" src="<?=$banner['image']['url']?>">
                     </div>
                 <?php endif; ?>
@@ -73,7 +73,7 @@ if( have_rows('sections') ):
                     <?php if($tiles): ?>
                         <div class="row">
                             <?php foreach($tiles as $tile): ?>
-                                <div class="col-md-4 card">
+                                <div class="col-md-4 card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="700">
                                     <div class="inner">
                                         <img src="<?=$tile['icon']['url']?>">
 
@@ -95,7 +95,7 @@ if( have_rows('sections') ):
         <?php elseif( get_row_layout() == 'global_cta' ): 
             $global_cta = get_field('global_cta', 'option'); ?>
 
-            <section id="global-cta" class="cta" data-aos="fade-up" data-aos-anchor-placement="center-bottom">
+            <section id="global-cta" class="cta" data-aos="fade-up" data-aos-anchor-placement="center-bottom" data-aos-delay="200" data-aos-duration="500">
                 <div class="container">
                     <div class="row align-center" style="background-color: <?=$global_cta['background_color']?>">
                         <div class="col-md-8">
@@ -145,7 +145,7 @@ if( have_rows('sections') ):
 
             <section id="simple-content" class="simple-content">
                 <div class="container">
-                    <div class="<?php if($text_alignment == 'center'){ echo 'text-center'; } ?>">
+                    <div class="<?php if($text_alignment == 'center'){ echo 'text-center'; } ?>" data-aos="fade-up" data-aos-anchor-placement="center-bottom" data-aos-delay="200" data-aos-duration="500">
                         <?php if($title): ?>
                             <h2><?=$title?></h2>
                         <?php endif; ?>
@@ -162,7 +162,7 @@ if( have_rows('sections') ):
             <section id="form" class="form-sect">
                 <div class="container">
                     <div class="row align-center">
-                        <div class="col-md-6 content">
+                        <div class="col-md-6 content" data-aos="fade-up" data-aos-anchor-placement="center-bottom" data-aos-delay="200" data-aos-duration="500">
                             <?php if($title): ?>
                                 <h2><?=$title?></h2>
                             <?php endif; ?>
@@ -170,7 +170,7 @@ if( have_rows('sections') ):
                             <?=$content?>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-6" data-aos="fade-up" data-aos-anchor-placement="center-bottom" data-aos-delay="200" data-aos-duration="500">
                             <div class="form" style="background-color: <?=$form['background_color']?>">
                                 <?php if($form['form_title']): ?>
                                     <h3><?=$form['form_title']?></h3>
@@ -201,7 +201,7 @@ if( have_rows('sections') ):
                             $points = get_field( 'points', $product->ID );
                             $_product = wc_get_product( $product->ID ); ?>
 
-                            <div class="col-md-4">
+                            <div class="col-md-4" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="700">
                                 <div class="pricing-header">
                                     <div class="icon">
                                         <img src="<?=$plan_icon['url']?>">
