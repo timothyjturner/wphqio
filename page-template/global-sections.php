@@ -169,7 +169,7 @@ if( have_rows('sections') ):
                             <?=$content?>
                         </div>
 
-                        <div class="col-md-6" data-aos="fade-up" data-aos-anchor-placement="center-bottom" data-aos-delay="200" data-aos-duration="800">
+                        <div class="col-md-6">
                             <div class="form" style="background-color: <?=$form['background_color']?>">
                                 <?php if($form['form_title']): ?>
                                     <h3><?=$form['form_title']?></h3>
