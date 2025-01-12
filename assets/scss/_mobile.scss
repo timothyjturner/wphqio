@@ -189,6 +189,10 @@
                 padding: 10px;
                 background-color: white;
             }
+
+            .calendly-inline-widget.calendly-mobile {
+                min-width: unset !important;
+            }
         }
         
         .col-md-6 {
