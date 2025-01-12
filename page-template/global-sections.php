@@ -156,8 +156,7 @@ if( have_rows('sections') ):
             </section>
         <?php elseif( get_row_layout() == 'form' ):
             $title = get_sub_field('title');
-            $content = get_sub_field('content');
-            $form = get_sub_field('form'); ?>
+            $content = get_sub_field('content'); ?>
 
             <section id="form" class="form-sect">
                 <div class="container">
@@ -179,7 +178,7 @@ if( have_rows('sections') ):
                                 <?php if($form['form_id']): ?>
                                     <div class="form-wrapper">
                                         <div class="calendly-inline-widget" data-url="https://calendly.com/timothyjturner/15min" style="min-width:320px;height:630px;"></div>
-                                        
+
                                         <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js"></script>
                                     </div>
                                 <?php endif; ?>

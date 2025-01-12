@@ -106,7 +106,6 @@ header.global-header {
 
 // Footer CSS
 footer.global-footer {
-    padding-top: 100px;
     background-color: $primary-color;
 
     .footer-logo {
@@ -144,8 +143,11 @@ footer.global-footer {
 
     .copyright {
         padding: 10px;
-        background-color: $accent-color;
         color: $white;
+
+        a {
+            color: $secondary-color;
+        }
     }
 }
 
@@ -517,6 +519,11 @@ section.form-sect {
         }
 
         .form-wrapper {
+
+            iframe {
+                border-radius: 25px;
+            }
+
             .wpforms-container {
                 margin-top: 10px;
             }
