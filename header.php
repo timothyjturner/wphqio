@@ -19,10 +19,10 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-04G4MEWXLN"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-04G4MEWXLN');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-04G4MEWXLN');
     </script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
@@ -30,13 +30,6 @@
 <body <?php body_class(); ?>>
 
 <?php $header = get_field('header', 'option'); ?>
-
-<!-- Cursor -->
-<div class="cursor">
-	<div class="cursor__circle cursor__circle--small"></div>
-	<div class="cursor__circle cursor__circle--large"></div>
-</div>
-<!-- End Cursor -->
 
 <header class="global-header">
     <div class="container">

@@ -34,7 +34,6 @@
 
 <?php wp_footer(); ?>
 
-<script type="module" src="<?php echo get_template_directory_uri() . '/assets/js/cursor.js' ?>"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
   AOS.init();
