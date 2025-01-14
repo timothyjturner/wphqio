@@ -41,3 +41,30 @@ function current_year_func() {
   return $current_year;
 }
 add_shortcode( 'year', 'current_year_func' );
+
+add_action('woocommerce_after_checkout_billing_form', 'add_terms_and_subscription_checkbox');
+function add_terms_and_subscription_checkbox() {
+    echo '<p class="form-row terms-and-subscription">
+        <label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
+            <input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox" name="terms_and_subscription" id="terms_and_subscription" /> 
+            <span>By completing this purchase, you agree to our 
+                <a href="' . esc_url(get_permalink(get_option('woocommerce_terms_page_id'))) . '" target="_blank">Terms of Service</a>
+                and acknowledge that your subscription will renew automatically until you cancel.
+            </span>
+        </label>
+    </p>';
+}
+
+add_action('woocommerce_checkout_process', 'validate_terms_and_subscription_checkbox');
+function validate_terms_and_subscription_checkbox() {
+    if (!isset($_POST['terms_and_subscription'])) {
+        wc_add_notice(__('Please agree to the Terms of Service and acknowledge the subscription renewal to proceed.'), 'error');
+    }
+}
+
+add_action('woocommerce_checkout_update_order_meta', 'save_terms_and_subscription_checkbox');
+function save_terms_and_subscription_checkbox($order_id) {
+    if (isset($_POST['terms_and_subscription'])) {
+        update_post_meta($order_id, '_terms_and_subscription', 'yes');
+    }
+}
