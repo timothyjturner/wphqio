@@ -48,7 +48,7 @@ function add_terms_and_subscription_checkbox() {
         <label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
             <input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox" name="terms_and_subscription" id="terms_and_subscription" /> 
             <span>By completing this purchase, you agree to our 
-                <a href="' . esc_url(get_permalink(get_option('woocommerce_terms_page_id'))) . '" target="_blank">Terms of Service</a>
+                <a href="/terms-of-services/" target="_blank">Terms of Service</a>
                 and acknowledge that your subscription will renew automatically until you cancel.
             </span>
         </label>
