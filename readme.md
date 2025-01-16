@@ -8,7 +8,7 @@ npm install gulp gulp-sass sass gulp-autoprefixer --save-dev
 npm install
 
 ## Task Runner
-npm install
+npx gulp
 
 ## Features
 
