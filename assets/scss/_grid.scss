@@ -1,0 +1,51 @@
+.container{
+    max-width: 1340px;
+    padding: 0 20px;
+    margin: 0 auto;
+}
+.row{
+    display: flex;
+    flex-wrap: wrap;
+}
+.col-md-2{
+    width: 20%;
+}
+.col-md-3{
+    width: 25%;
+}
+.col-md-4{
+    width: 33.33%;
+}
+.col-md-5{
+    width: 40%;
+}
+.col-md-6{
+    width: 50%;
+}
+.col-md-7{
+    width: 60%;
+}
+.col-md-8{
+    width: 66.66%;
+}
+.col-md-9{
+    width: 75%;
+}
+.col-md-10{
+    width: 80%;
+}
+.col-md-12{
+    width: 100%;
+}
+.align-center{
+    align-items: center;
+}
+.text-center{
+    text-align: center;
+}
+.w-100{
+    width: 100%;
+}
+.justify-center {
+    justify-content: center;
+}

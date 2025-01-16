@@ -1,0 +1,137 @@
+/* _reset.scss */
+*,
+*::before,
+*::after, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+h1 {
+    font-size: 55px;
+    line-height: 70px;
+    margin-bottom: 20px;
+}
+h2 {
+    font-size: 50px;
+    line-height: 62px;
+}
+li.primary-btn {
+    position: relative;
+}
+.primary-btn > a, a.primary-btn {
+    background-color: #d86e26;
+    color: #fff;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-right: 0 !important;
+    border-radius: 12px;
+    height: fit-content;
+    line-height: 26px;
+    border: 2px solid #d86e26;
+    display: block;
+    cursor: pointer;
+
+    img {
+        width: 20px;
+        height: 20px;
+        position: relative;
+        top: 4px;
+        left: 7px;
+    }
+}
+.primary-btn a {
+    color: white !important;
+}
+a.white-btn {
+    background-color: transparent;
+    color: #d86e26;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+    border-radius: 12px;
+    border: 2px solid #d86e26;
+    background-color: #ffffff;
+    height: fit-content;
+}
+a.white-btn:hover, a.primary-btn:hover, li.request-btn:hover, .primary-btn > a:hover {
+    filter: drop-shadow(1px 2px 6px black);
+}
+a.black-btn {
+    color: #223847;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    border: 2px solid #223847;
+}
+.primary-btn.active > a {
+    background-color: #d86e26;
+    color: #ffffff;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-right: 0 !important;
+    height: fit-content;
+    line-height: 26px;
+    border: 1px solid #d86e26;
+    border-radius: 0;
+    border-color: #ffffff;
+    text-align: center;
+}
+.btn-dropdown-wrapper {
+    position: relative;
+}
+.btn-dropdown-wrapper .dropdown, .primary-btn .sub-menu {
+    display: none;
+    position: absolute;
+    width: 100%;
+    background-color: #d86e26;
+    border: 1px solid white;
+    box-shadow: 0px 2px 3px 3px #00000024;
+
+    li {
+        border-bottom: 1px solid white;
+        text-align: center;
+
+        &:last-child {
+            border-bottom: 0px;
+        }
+
+        a {
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            display: block;
+            padding: 10px 5px;
+        }
+    }
+}
+.btn-dropdown-wrapper .dropdown.active {
+    display: block !important;
+}
+.primary-btn ul.sub-menu.active {
+    display: block !important;
+}
+.primary-btn ul.sub-menu.active {
+    left: 0;
+    margin-top: 0px;
+
+    li {
+        margin-right: 0px !important;
+    }
+}
