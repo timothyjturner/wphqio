@@ -104,7 +104,7 @@ get_header(); ?>
             <div class="col-md-8">
                 <h2>Ready to Transform Your Website?</h2>
 
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
+                <p>We are ready to help!</p>
 
                 <div class="row">
                     <a class="white-btn" href="#">Free Consultation</a>
