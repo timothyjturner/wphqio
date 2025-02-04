@@ -19,12 +19,15 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-04G4MEWXLN"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-04G4MEWXLN');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-04G4MEWXLN');
     </script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
+
+<body <?php body_class(); ?>>
 
 <?php $header = get_field('header', 'option'); ?>
 
@@ -37,6 +40,12 @@
 
             <div class="header-nav col-md-9">
                 <div class="nav-wrapper">
+                    <div class="hamburger is-lg">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </div>
+                    
                     <?php 	
                         wp_nav_menu( array( 'theme_location'=>'main-menu', 'container_class'=>'main-menu' ) ); 
                     ?>
@@ -45,4 +54,3 @@
         </div>
     </div>
 </header>
-<body>

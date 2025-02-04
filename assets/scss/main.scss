@@ -1,18 +1,72 @@
+@import 'mobile';
 @import 'reset';
 @import 'variables';
 @import 'grid';
-@import 'mobile';
+
 
 // Header CSS
 header.global-header {
     background: linear-gradient(-180deg, #000000, #223847);
     z-index: 9;
     position: relative;
-    padding: 10px 0px;
+    padding: 30px 0px;
 
     .header-logo {
         img {
-            max-width: 100px;
+            max-width: 180px;
+        }
+    }
+
+    .header-nav {
+        .hamburger {
+            display: none;
+            position: relative;
+            width: 1em;
+            height: 1em;
+            font-size: inherit;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            float: right;
+          
+            &.is-lg {
+              font-size: 2rem;
+            }
+          
+            &-line {
+                position: absolute;
+                right: 0;
+                width: 100%;
+                height: 0.125em;
+                border-radius: 0.125em;
+                background: $white;
+                transition: inherit;
+          
+                &:nth-child(1) {
+                    top: 0.125em;
+                }
+          
+                &:nth-child(2) {
+                    top: 0.438em;
+                }
+            
+                &:nth-child(3) {
+                    top: 0.75em;
+                    width: 0.625em;
+                }
+            }
+        }
+        .hamburger.is-active .hamburger-line:nth-child(1), .w-nav-button.w--open .hamburger-line:nth-child(1) {
+            top: 50%;
+            transform: translateY(-50%) rotateZ(-135deg);
+        }
+        .hamburger.is-active .hamburger-line:nth-child(2), .w-nav-button.w--open .hamburger-line:nth-child(2) {
+            right: 50%;
+            width: 0;
+        }
+        .hamburger.is-active .hamburger-line:nth-child(3), .w-nav-button.w--open .hamburger-line:nth-child(3) {
+            top: 50%;
+            width: 100%;
+            transform: translateY(-50%) rotateZ(135deg);
         }
     }
 }
@@ -52,7 +106,6 @@ header.global-header {
 
 // Footer CSS
 footer.global-footer {
-    padding-top: 100px;
     background-color: $primary-color;
 
     .footer-logo {
@@ -68,7 +121,7 @@ footer.global-footer {
         }
 
         .menu {
-            li.page_item {
+            li.menu-item {
                 margin-bottom: 10px;
 
                 a {
@@ -90,8 +143,11 @@ footer.global-footer {
 
     .copyright {
         padding: 10px;
-        background-color: $accent-color;
         color: $white;
+
+        a {
+            color: $secondary-color;
+        }
     }
 }
 
@@ -389,9 +445,10 @@ section.pricing-table {
             }
     
             .icon {
-                svg {
+                img {
                     width: 50px;
                     height: 50px;
+                    filter: brightness(0) invert(1);
                 }
             }
 
@@ -425,8 +482,7 @@ section.pricing-table {
                     padding: 8px 8px;
                     background-size: contain;
                     background-repeat: no-repeat;
-                    top: 50%;
-                    transform: translate(0px, -50%);
+                    top: 5px;
                 }
             }
         }
@@ -435,8 +491,11 @@ section.pricing-table {
 
 // who we are page
 section.simple-content {
-    padding: 100px 0px 0px 0px;
-    text-align: center;
+    padding: 100px 0px 100px 0px;
+
+    h2 {
+        margin-bottom: 20px;
+    }
 
     p {
         font-size: 18px;
@@ -445,12 +504,12 @@ section.simple-content {
 
 // Request a Quote Page
 section.form-sect {
-    padding: 100px 0px 0px 0px;
+    padding: 100px 0px 100px 0px;
 
     .form {
         background-color: $accent-color;
         border-radius: 25px;
-        padding: 40px 30px;
+        padding: 5px 5px;
         position: relative;
 
         h3 {
@@ -459,6 +518,11 @@ section.form-sect {
         }
 
         .form-wrapper {
+
+            iframe {
+                border-radius: 25px;
+            }
+
             .wpforms-container {
                 margin-top: 10px;
             }
@@ -536,4 +600,34 @@ section.form-sect {
             }
         }
     }
+}
+.woocommerce-dashboard {
+    .woocommerce {
+        max-width: 1340px;
+        padding: 60px 20px;
+        margin: 0 auto;
+
+        a {
+            color: $secondary-color;
+        }
+
+        .woocommerce-MyAccount-navigation-link.is-active {
+            a {
+                padding: 10px 40px;
+                display: block;
+                background-color: #d86e26;
+                color: white;
+                width: fit-content;
+                margin-bottom: 5px;
+                border-radius: 5px;
+            }
+        }
+    }
+}
+
+a.added_to_cart.wc-forward {
+    display: none;
+}
+.page-id-92 section.simple-content {
+    padding-bottom: 0px;
 }
