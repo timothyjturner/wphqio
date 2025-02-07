@@ -29,7 +29,7 @@ if ( have_posts() ) :
 
 
 
-    <section id="global-cta" class="cta" data-aos="fade-up" data-aos-anchor-placement="center-bottom" data-aos-delay="200" data-aos-duration="800">
+    <!-- <section id="global-cta" class="cta" data-aos="fade-up" data-aos-anchor-placement="center-bottom" data-aos-delay="200" data-aos-duration="800">
                 <div class="container">
                     <div class="row align-center" style="background-color: <?=$global_cta['background_color']?>">
                         <div class="col-md-8">
@@ -70,7 +70,7 @@ if ( have_posts() ) :
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> -->
 
 <?php
     endwhile;
