@@ -12,7 +12,7 @@ if ( have_posts() ) :
                     <div class="text-center__">
 
 
-<?php the_post_thumbnail( 'full', array( 'class' => 'custom-class', 'alt' => get_the_title() ) ); ?>
+<!-- <?php the_post_thumbnail( 'full', array( 'class' => 'custom-class', 'alt' => get_the_title() ) ); ?> -->
 
  <!-- Display the Featured Image -->
         <?php
