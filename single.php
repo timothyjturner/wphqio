@@ -18,13 +18,13 @@ if ( have_posts() ) :
         <?php
         if ( has_post_thumbnail() ) :
             ?>
-            <div class="post-featured-image">
+            <div class="post-featured-image post__featured__img">
                 <?php the_post_thumbnail( 'full' ); ?>
             </div>
         <?php endif; ?>
 
 
-        
+
             <!-- <h1 class="entry-title"><?php the_title(); ?></h1> -->
             
 
