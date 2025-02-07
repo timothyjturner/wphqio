@@ -14,7 +14,7 @@ if ( have_posts() ) :
 
 
 
-            <h1 class="entry-title"><?php the_title(); ?></h1>
+            <!-- <h1 class="entry-title"><?php the_title(); ?></h1> -->
             
 
         <!-- Post Content -->
@@ -22,15 +22,7 @@ if ( have_posts() ) :
             <?php the_content(); ?>
         </div><!-- .entry-content -->
 
-        <!-- Post Footer -->
-        <footer class="entry-footer">
-            <div class="post-categories">
-                <?php the_category( ', ' ); ?>
-            </div>
-            <div class="post-tags">
-                <?php the_tags( 'Tags: ', ', ' ); ?>
-            </div>
-        </footer><!-- .entry-footer -->
+      
     </section>
     <!-- End of the Post -->
 
