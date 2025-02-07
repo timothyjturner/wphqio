@@ -6,16 +6,16 @@ if ( have_posts() ) :
 ?>
 
     <!-- Start of the Post -->
-    <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-        
-        <!-- Post Title -->
-        <header class="entry-header">
+       
+<section id="simple-content" class="simple-content">
+                <div class="container">
+                    <div class="text-center">
+
+
+
+
             <h1 class="entry-title"><?php the_title(); ?></h1>
-            <div class="entry-meta">
-                <span class="posted-on"><?php echo get_the_date(); ?></span>
-                <span class="author"> by <?php the_author(); ?></span>
-            </div>
-        </header><!-- .entry-header -->
+            
 
         <!-- Post Content -->
         <div class="entry-content">
@@ -31,7 +31,7 @@ if ( have_posts() ) :
                 <?php the_tags( 'Tags: ', ', ' ); ?>
             </div>
         </footer><!-- .entry-footer -->
-    </article>
+    </section>
     <!-- End of the Post -->
 
 <?php
