@@ -9,7 +9,7 @@ if ( have_posts() ) :
        
 <section id="simple-content" class="simple-content">
                 <div class="container">
-                    <div class="text-center">
+                    <div class="text-center__">
 
 
 
