@@ -12,8 +12,19 @@ if ( have_posts() ) :
                     <div class="text-center__">
 
 
+<?php the_post_thumbnail( 'full', array( 'class' => 'custom-class', 'alt' => get_the_title() ) ); ?>
+
+ <!-- Display the Featured Image -->
+        <?php
+        if ( has_post_thumbnail() ) :
+            ?>
+            <div class="post-featured-image">
+                <?php the_post_thumbnail( 'full' ); ?>
+            </div>
+        <?php endif; ?>
 
 
+        
             <!-- <h1 class="entry-title"><?php the_title(); ?></h1> -->
             
 
