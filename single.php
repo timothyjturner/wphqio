@@ -20,12 +20,12 @@ if ( have_posts() ) :
             ?>
             <div class="post-featured-image post__featured__img">
                 <?php the_post_thumbnail( 'full' ); ?>
+                <h1 class="entry-title"><?php the_title(); ?></h1>
             </div>
         <?php endif; ?>
 
 
-
-            <!-- <h1 class="entry-title"><?php the_title(); ?></h1> -->
+ 
             
 
         <!-- Post Content -->
