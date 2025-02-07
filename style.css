@@ -4,5 +4,6 @@ Theme URI: https://wphq.io
 Author: Timothy J Turner 
 Author URI: https://wphq.io
 Description: A lightweight WordPress theme with SCSS and CSS reset.
-Version: 1.0.0
+Version: 1.0.1
 */
+.single h1{text-align: center;}
