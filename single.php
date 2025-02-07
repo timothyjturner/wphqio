@@ -7,7 +7,7 @@ if ( have_posts() ) :
 
     <!-- Start of the Post -->
        
-<section id="simple-content" class="simple-content">
+<section id="simple-content" class="simple-content simple__content__pding">
                 <div class="container">
                     <div class="text-center__">
 
