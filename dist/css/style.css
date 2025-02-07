@@ -11,9 +11,10 @@
 .post__featured__img img{width:100%; height: 100%;}
 
 section.simple__content__pding{padding: 30px 0 100px 0 !important;}
-.post__featured__img h1{position: absolute; bottom: 0; z-index: 99; text-align: center; background: #ffffff63; font-size: 55px; width: 100%; padding: 19px 0;  line-height: 1.2; margin-bottom: 0;}
+.post__featured__img h1{position: absolute; bottom: 0; z-index: 99; text-align: center; background: #ffffff63; width: 100%; padding: 19px 0;  line-height: 1.2; margin-bottom: 0;}
 
 @media (max-width: 767px) {
 section.simple__content__pding{padding: 20px 0 50px 0 !important;}
 .post__featured__img{margin-bottom: 50px;}
+.post__featured__img h1 {font-size: 17px !important; line-height: 1.2 !important;  padding: 21px 0 !important;}
 }
