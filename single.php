@@ -26,7 +26,7 @@ if ( have_posts() ) :
 
 
  
-            
+             
 
         <!-- Post Content -->
         <div class="entry-content blog_entry__text">

@@ -22,5 +22,6 @@ section.simple__content__pding{padding: 20px 0 50px 0 !important;}
 
 .blog_entry__text h1 {font-size: 32px !important; line-height: 44px !important;}
 .blog_entry__text h2 {font-size: 28px !important; line-height: 40px !important;}
-.blog_entry__text h3 {font-size: 24px !important;line-height: 36px !important;  margin: 15px 0 2px !important;}
+.blog_entry__text h3 {font-size: 24px !important;line-height: 36px !important; margin: 15px 0 2px !important;}
+.single .wp-block-separator {padding-top: 20px;  margin-top: 25px;}
 }
