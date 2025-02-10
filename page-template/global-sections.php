@@ -149,7 +149,7 @@ if( have_rows('sections') ):
             $title = get_sub_field('title');
             $content = get_sub_field('content'); ?>
 
-            <section id="simple-content" class="simple-content">
+            <section id="simple-content" class="simple-content aa">
                 <div class="container">
                     <div class="<?php if($text_alignment == 'center'){ echo 'text-center'; } ?>">
                         <?php if($title): ?>
@@ -160,6 +160,7 @@ if( have_rows('sections') ):
                     </div>
                 </div>
             </section>
+
         <?php elseif( get_row_layout() == 'form' ):
             $title = get_sub_field('title');
             $content = get_sub_field('content'); ?>
