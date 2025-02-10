@@ -14,10 +14,8 @@
 <script>
   AOS.init();
 </script>
-<script
-  src="https://code.jquery.com/jquery-3.7.1.slim.js"
-  integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc="
-  crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
 <script>
 $(function() {
