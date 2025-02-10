@@ -25,7 +25,31 @@ get_header(); ?>
                                     $global_button_links = get_field('global_button_links', 'option');
                                     ?>
                                         <div class="aabtn-dropdown-wrapper">
-                                            <a class="primary-btn2" href="#simple-content"><?=$buttons['button']['title']?></a>
+
+
+                                            
+
+$url = "https://wphq.io/wordpress-hosting-maintenance/";
+$headers = @get_headers($url);
+if ($headers && strpos($headers[0], '200')) {
+ <a class="primary-btn2" href="#simple-content"><?=$buttons['button']['title']?></a>
+} else {
+    <a class="primary-btn" href="#"><?=$buttons['button']['title']?></a>
+    <div class="dropdown">
+                                                <ul class="links">
+                                                    <?php foreach($global_button_links as $global_links): ?>
+                                                        <?php if($banner['get_started_button_go_down_to_pricing_page'] && $global_links['link']['title'] == 'Hosting' || $global_links['link']['title'] == 'Maintenance' || $global_links['link']['title'] == 'SEO'){ 
+                                                            ?>
+                                                                <li><a href="#pricing-table"><?=$global_links['link']['title']?></a></li>
+                                                            <?php
+                                                        }else { ?>
+                                                            <li><a href="<?=$global_links['link']['url']?>"><?=$global_links['link']['title']?></a></li>
+                                                        <?php } ?>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            </div>
+}
+
 
                                            <!--  <div class="dropdown">
                                                 <ul class="links">
