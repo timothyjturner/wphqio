@@ -27,7 +27,7 @@ get_header(); ?>
                                         <div class="btn-dropdown-wrapper">
 
 
-                                            <a class="primary-btn" href="#simple-content"><?=$buttons['button']['title']?></a>
+                                            <a class="primary-btn" href="#"><?=$buttons['button']['title']?></a>
 
                                            <div class="dropdown">
                                                 <ul class="links">
