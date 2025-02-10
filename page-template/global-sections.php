@@ -25,9 +25,9 @@ get_header(); ?>
                                     $global_button_links = get_field('global_button_links', 'option');
                                     ?>
                                         <div class="btn-dropdown-wrapper">
-                                            <a class="primary-btn" href="#"><?=$buttons['button']['title']?></a>
+                                            <a class="primary-btn" href="#simple-content"><?=$buttons['button']['title']?></a>
 
-                                            <div class="dropdown">
+                                           <!--  <div class="dropdown">
                                                 <ul class="links">
                                                     <?php foreach($global_button_links as $global_links): ?>
                                                         <?php if($banner['get_started_button_go_down_to_pricing_page'] && $global_links['link']['title'] == 'Hosting' || $global_links['link']['title'] == 'Maintenance' || $global_links['link']['title'] == 'SEO'){ 
@@ -39,7 +39,7 @@ get_header(); ?>
                                                         <?php } ?>
                                                     <?php endforeach; ?>
                                                 </ul>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     <?php
                                 }else {
