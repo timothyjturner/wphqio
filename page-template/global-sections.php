@@ -26,8 +26,15 @@ get_header(); ?>
                                     ?>
                                         <div class="aabtn-dropdown-wrapper">
 
-                                            
-                                            <a class="primary-btn2" href="#simple-content"><?=$buttons['button']['title']?></a>
+<?php
+if (stripos($_SERVER['REQUEST_URI'], 'wordpress-hosting-maintenance')){
+     echo ' <a class="primary-btn2" href="#simple-content"><?=$buttons['button']['title']?></a>';
+}
+else{
+     echo ' <a class="primary-btn" href="#simple-content"><?=$buttons['button']['title']?></a>';
+}
+
+                                           
 
                                            <!--  <div class="dropdown">
                                                 <ul class="links">
