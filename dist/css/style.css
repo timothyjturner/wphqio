@@ -16,7 +16,7 @@ section.simple__content__pding{padding: 30px 0 100px 0 !important;}
 .blog_entry__text h3 {font-size: 25px; line-height: 34px;  margin: 15px 0 0;}
 .primary-btn2 {background-color: #d86e26; color: #fff; padding: 15px 30px; font-size: 18px; font-weight: 600; margin-right: 0 !important; border-radius: 12px; height: -webkit-fit-content; height: -moz-fit-content; height: fit-content; line-height: 26px; border: 2px solid #d86e26;  display: block;  cursor: pointer;}
 
-
+.primary-btn2:hover {-webkit-filter: drop-shadow(1px 2px 6px #000);  filter: drop-shadow(1px 2px 6px #000);}
 
 
 @media (max-width: 767px) {

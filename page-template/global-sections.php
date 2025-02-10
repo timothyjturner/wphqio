@@ -25,7 +25,7 @@ get_header(); ?>
                                     $global_button_links = get_field('global_button_links', 'option');
                                     ?>
                                         <div class="aabtn-dropdown-wrapper">
-                                            <a class="primary-btn" href="#simple-content"><?=$buttons['button']['title']?></a>
+                                            <a class="primary-btn2" href="#simple-content"><?=$buttons['button']['title']?></a>
 
                                            <!--  <div class="dropdown">
                                                 <ul class="links">
