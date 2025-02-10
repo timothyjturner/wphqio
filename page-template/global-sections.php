@@ -24,8 +24,8 @@ get_header(); ?>
                                 <?php if ($buttons['button']['title'] == 'Get Started'){
                                     $global_button_links = get_field('global_button_links', 'option');
                                     ?>
-                                        <div class="btn-dropdown-wrapper">
-                                            <a class="primary-btn" href="https://wphq.io/seo-performance-subscriptions#simple-content"><?=$buttons['button']['title']?></a>
+                                        <div class="aabtn-dropdown-wrapper">
+                                            <a class="primary-btn2" href="https://wphq.io/seo-performance-subscriptions#simple-content"><?=$buttons['button']['title']?></a>
 
                                            <!--  <div class="dropdown">
                                                 <ul class="links">
