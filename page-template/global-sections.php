@@ -30,7 +30,7 @@ get_header(); ?>
                                             <div class="dropdown">
                                                 <ul class="links">
                                                     <?php foreach($global_button_links as $global_links): ?>
-                                                        <?php if($banner['get_started_button_go_down_to_pricing_page'] && $global_links['link']['title'] == 'Hosting' || $global_links['link']['title'] == 'Maintenance' || $global_links['link']['title'] == 'SEO'){ 
+                                                        <?php if($banner['get_started_button_go_down_to_pricing_page'] && $global_links['link']['title'] == 'Hosting' || $global_links['link']['title'] == 'SEO'){ 
                                                             ?>
                                                                 <li><a href="https://wphq.io/seo-performance-subscriptions/#pricing-table"><?=$global_links['link']['title']?></a></li>
                                                             <?php
