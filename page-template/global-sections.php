@@ -33,7 +33,7 @@ get_header(); ?>
                                                         <?php if($banner['get_started_button_go_down_to_pricing_page'] && $global_links['link']['title'] == 'Hosting' || $global_links['link']['title'] == 'Maintenance' || $global_links['link']['title'] == 'SEO'){ 
                                                             ?>
                                                                 <li><a href="https://wphq.io/seo-performance-subscriptions/#pricing-table"><?=$global_links['link']['title']?></a></li>
-                                                                <li><a href="/#pricing-table"><?=$global_links['link']['title']?></a></li>
+                                                                
                                                             <?php
                                                         }else { ?>
                                                             <li><a href="<?=$global_links['link']['url']?>"><?=$global_links['link']['title']?></a></li>
