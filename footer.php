@@ -15,16 +15,21 @@
   AOS.init();
 </script>
 
-<!-- <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script>
-$('a').click(function(){
-    $('html, body').animate({
-        scrollTop: $( $(this).attr('href') ).offset().top
-    }, 500);
-    return false;
+$(document).ready(function() {
+  $('a[href^="#"]').on('click', function(e) {
+    e.preventDefault();
+    var target = $(this.getAttribute('href'));
+    if (target.length) {
+      $('html, body').stop().animate({
+        scrollTop: target.offset().top
+      }, 1000); // Adjust duration (in milliseconds) for speed
+    }
+  });
 });
-</script> -->
+</script>
 
 </body>
 </html>

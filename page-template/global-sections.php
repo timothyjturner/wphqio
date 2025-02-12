@@ -11,7 +11,7 @@ get_header(); ?>
     <section class="banner" style="background-color: <?=$banner['background_color']?>;">
         <div class="container">
             <div class="row align-center">
-                <div class="<?php if($banner['image']){ echo 'col-md-6'; }else { echo 'col-md-12 text-center'; } ?> content" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
+                <div class="<?php if($banner['image']){ echo 'col-md-6'; }else { echo 'col-md-12 text-center'; } ?> content" data-aos="fade-up"                     data-aos-delay="200" data-aos-duration="800">
                     <?php if($banner['title']): ?>
                         <h1><?=$banner['title']?></h1>
                     <?php endif; ?>
@@ -24,27 +24,55 @@ get_header(); ?>
                                 <?php if ($buttons['button']['title'] == 'Get Started'){
                                     $global_button_links = get_field('global_button_links', 'option');
                                     ?>
-                                        <div class="btn-dropdown-wrapper">
-                                            <a class="primary-btn" href="#"><?=$buttons['button']['title']?></a>
+                        
+                        
+                        
+                        
+                        
+                        
+
+                        
+        <?php
+        if( is_page( 'seo-performance-subscriptions' ) ) {?>
+                        
+     <div class="btn-dropdown-wrapper">
+     <a class="primary-btn2 <?php $title ?>" href="#simple-content"><?=$buttons['button']['title']?></a>
+     </div>
+                        
+  <?php
+  }elseif ( is_page( 'wordpress-hosting-maintenance' )) { ?>                
+            <div class="btn-dropdown-wrapper">
+     <a class="primary-btn2 <?php $title ?>" href="#simple-content"><?=$buttons['button']['title']?></a>
+     </div>         
+                        
+  <?php
+   }else {
+          ?>
+                        <div class="btn-dropdown-wrapper">
+ <a class="primary-btn <?php $title ?>" href="#"><?=$buttons['button']['title']?></a>
 
                                             <div class="dropdown">
                                                 <ul class="links">
                                                     <?php foreach($global_button_links as $global_links): ?>
-                                                        <?php if($banner['get_started_button_go_down_to_pricing_page'] && $global_links['link']['title'] == 'SEO'){ 
-                                                            ?>
-                                                                <li><a href="https://wphq.io/seo-performance-subscriptions/#pricing-table"><?=$global_links['link']['title']?></a></li>
-                                                            <?php
-                                                        }else { ?>
-                                                            <li><a href="<?=$global_links['link']['url']?>"><?=$global_links['link']['title']?></a></li>
-                                                        <?php } ?>
+                                                        <li><a href="<?=$global_links['link']['url']?>"><?=$global_links['link']['title']?></a></li>
                                                     <?php endforeach; ?>
                                                 </ul>
                                             </div>
                                         </div>
+                    <?php
+     } ?>               
+                        
+                        
+                        
+                        
+                        
+                                        
+                        
+                        
                                     <?php
                                 }else {
                                     ?>
-                                        <a class="white-btn" href="<?=$buttons['button']['url']?>"><?=$buttons['button']['title']?></a>
+                                        <a class="white-btn aaa" href="<?=$buttons['button']['url']?>"><?=$buttons['button']['title']?></a>
                                     <?php
                                 } ?>
                             <?php endforeach; ?>
