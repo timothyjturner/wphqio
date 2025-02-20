@@ -216,33 +216,34 @@ if( have_rows('sections') ):
                                     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js"></script>
                                 </div>
                             </div>
-                    <a class="link underline" href="#">Learn More</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
+            </section>
 
-<section class="cta">
-    <div class="container">
-        <div class="row align-center">
-            <div class="col-md-8">
-                <h2>Ready to Transform Your Website?</h2>
+            <section class="cta">
+                <div class="container">
+                    <div class="row align-center">
+                        <div class="col-md-8">
+                            <h2>Ready to Transform Your Website?</h2>
 
-                <p>We are ready to help!</p>
+                            <p>We are ready to help!</p>
 
-                <div class="row">
-                    <a class="white-btn" href="#">Free Consultation</a>
-                    <div class="btn-dropdown-wrapper">
-                        <a class="primary-btn" href="#">Get Started</a>
+                            <div class="row">
+                                <a class="white-btn" href="#">Free Consultation</a>
+                                <div class="btn-dropdown-wrapper">
+                                    <a class="primary-btn" href="#">Get Started</a>
 
-                        <div class="dropdown">
-                            <ul class="links">
-                                <li><a href="#">Hosting</a></li>
-                                <li><a href="#">Maintenance</a></li>
-                                <li><a href="#">SEO</a></li>
-                                <li><a href="#">Custom Quote</a></li>
-                            </ul>
+                                    <div class="dropdown">
+                                        <ul class="links">
+                                            <li><a href="#">Hosting</a></li>
+                                            <li><a href="#">Maintenance</a></li>
+                                            <li><a href="#">SEO</a></li>
+                                            <li><a href="#">Custom Quote</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
