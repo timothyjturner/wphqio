@@ -250,245 +250,280 @@ if( have_rows('sections') ):
             </section>
 
         <?php elseif( get_row_layout() == 'pricing_table' ):
-            $products = get_sub_field('products');
+            /*
+             * ACF structure:
+             * Sections (Flexible Content) > Pricing Table > Plans (Repeater)
+             * Each plan row contains:
+             * - plan_type
+             * - monthly_product
+             * - annual_product
+             * - one_time_product
+             */
+            $plans = get_sub_field('plans');
 
-            // ACF Post Object fields may return a WP_Post object or a numeric ID.
-            $wphq_get_product_id = static function ($value) {
-                if ($value instanceof WP_Post) {
-                    return (int) $value->ID;
-                }
+            if (!empty($plans) && is_array($plans)):
+                $has_subscription_plans = false;
 
-                if (is_object($value) && isset($value->ID)) {
-                    return (int) $value->ID;
-                }
+                foreach ($plans as $plan_check) {
+                    $check_type = isset($plan_check['plan_type'])
+                        ? sanitize_key((string) $plan_check['plan_type'])
+                        : '';
 
-                return absint($value);
-            };
-
-            // Support the final field names plus a few harmless aliases.
-            $wphq_get_first_field = static function (array $field_names, $post_id) {
-                foreach ($field_names as $field_name) {
-                    $value = get_field($field_name, $post_id);
-                    if ($value !== null && $value !== false && $value !== '') {
-                        return $value;
+                    if (in_array($check_type, array('subscription', 'subscriptions', 'monthly_annual'), true)) {
+                        $has_subscription_plans = true;
+                        break;
                     }
                 }
+            ?>
 
-                return null;
-            };
-        ?>
-
-            <section id="pricing-table" class="pricing-table wphq-pricing-table">
+            <section id="pricing-table" class="pricing-table" data-default-billing="annual">
                 <div class="container">
-                    <?php if (!empty($products) && is_array($products)) : ?>
-                        <div class="wphq-billing-toggle" aria-label="Choose subscription billing period">
-                            <span class="wphq-billing-label wphq-billing-label--monthly">Monthly</span>
-                            <button
-                                type="button"
-                                class="wphq-billing-switch is-annual"
-                                role="switch"
-                                aria-checked="true"
-                                aria-label="Toggle annual billing"
-                            >
-                                <span class="wphq-billing-switch__handle"></span>
-                            </button>
-                            <span class="wphq-billing-label wphq-billing-label--annual is-active">Annual</span>
-                            <span class="wphq-billing-savings">Save 10% yearly</span>
-                        </div>
+                    <?php if ($has_subscription_plans): ?>
+                        <div class="pricing-billing-selector" aria-label="Subscription billing period">
+                            <span class="pricing-billing-label pricing-billing-label--monthly">Monthly</span>
 
-                        <div class="row table-main">
-                            <?php foreach ($products as $display_product_post) :
-                                $display_product_id = $wphq_get_product_id($display_product_post);
-
-                                if (!$display_product_id) {
-                                    continue;
-                                }
-
-                                $title     = get_the_title($display_product_id);
-                                $plan_icon = get_field('plan_icon', $display_product_id);
-                                $plan_name = get_field('plan_name', $display_product_id);
-                                $points    = get_field('points', $display_product_id);
-
-                                $raw_plan_type = (string) $wphq_get_first_field(
-                                    array('plan_type', 'pricing_plan_type'),
-                                    $display_product_id
-                                );
-                                $normalized_plan_type = strtolower(trim(str_replace(array('-', ' '), '_', $raw_plan_type)));
-                                $is_one_time = in_array(
-                                    $normalized_plan_type,
-                                    array('one_time', 'one_time_product', 'onetime', 'standalone', 'single'),
-                                    true
-                                );
-
-                                $monthly_field = $wphq_get_first_field(
-                                    array('monthly_product', 'monthly_plan', 'monthly_subscription_product'),
-                                    $display_product_id
-                                );
-                                $annual_field = $wphq_get_first_field(
-                                    array('annual_product', 'yearly_product', 'annual_plan', 'annual_subscription_product'),
-                                    $display_product_id
-                                );
-                                $one_time_field = $wphq_get_first_field(
-                                    array('one_time_product', 'one_time_plan', 'standalone_product', 'single_product'),
-                                    $display_product_id
-                                );
-
-                                $monthly_id  = $wphq_get_product_id($monthly_field);
-                                $annual_id   = $wphq_get_product_id($annual_field);
-                                $one_time_id = $wphq_get_product_id($one_time_field);
-
-                                // Graceful fallbacks preserve the existing live cards while products are configured.
-                                if ($is_one_time) {
-                                    $one_time_id = $one_time_id ?: $display_product_id;
-                                } else {
-                                    $monthly_id = $monthly_id ?: $display_product_id;
-                                    $annual_id  = $annual_id ?: $monthly_id;
-                                }
-
-                                $monthly_product  = $monthly_id ? wc_get_product($monthly_id) : false;
-                                $annual_product   = $annual_id ? wc_get_product($annual_id) : false;
-                                $one_time_product = $one_time_id ? wc_get_product($one_time_id) : false;
-
-                                if ($is_one_time && !$one_time_product) {
-                                    continue;
-                                }
-
-                                if (!$is_one_time && !$monthly_product && !$annual_product) {
-                                    continue;
-                                }
-
-                                $default_product = $is_one_time
-                                    ? $one_time_product
-                                    : ($annual_product ?: $monthly_product);
-
-                                $default_product_id = $default_product ? $default_product->get_id() : 0;
-                                $default_price_html = $default_product ? $default_product->get_price_html() : '';
-                                $default_add_url = $default_product
-                                    ? add_query_arg('add-to-cart', $default_product_id, wc_get_cart_url())
-                                    : '#';
-
-                                $monthly_price_html = $monthly_product ? $monthly_product->get_price_html() : '';
-                                $annual_price_html  = $annual_product ? $annual_product->get_price_html() : '';
-                                $one_time_price_html = $one_time_product ? $one_time_product->get_price_html() : '';
-
-                                $monthly_add_url = $monthly_product
-                                    ? add_query_arg('add-to-cart', $monthly_product->get_id(), wc_get_cart_url())
-                                    : '#';
-                                $annual_add_url = $annual_product
-                                    ? add_query_arg('add-to-cart', $annual_product->get_id(), wc_get_cart_url())
-                                    : '#';
-                                $one_time_add_url = $one_time_product
-                                    ? add_query_arg('add-to-cart', $one_time_product->get_id(), wc_get_cart_url())
-                                    : '#';
-                            ?>
-                                <div
-                                    class="col-md-4 wphq-pricing-plan <?php echo $is_one_time ? 'wphq-pricing-plan--one-time' : 'wphq-pricing-plan--subscription'; ?>"
-                                    data-aos="flip-left"
-                                    data-aos-easing="ease-out-cubic"
-                                    data-aos-duration="800"
-                                    <?php if (!$is_one_time) : ?>
-                                        data-monthly-id="<?php echo esc_attr($monthly_product ? $monthly_product->get_id() : ''); ?>"
-                                        data-monthly-price="<?php echo esc_attr(wp_strip_all_tags($monthly_price_html)); ?>"
-                                        data-monthly-price-html="<?php echo esc_attr($monthly_price_html); ?>"
-                                        data-monthly-url="<?php echo esc_url($monthly_add_url); ?>"
-                                        data-annual-id="<?php echo esc_attr($annual_product ? $annual_product->get_id() : ''); ?>"
-                                        data-annual-price="<?php echo esc_attr(wp_strip_all_tags($annual_price_html)); ?>"
-                                        data-annual-price-html="<?php echo esc_attr($annual_price_html); ?>"
-                                        data-annual-url="<?php echo esc_url($annual_add_url); ?>"
-                                    <?php else : ?>
-                                        data-one-time-id="<?php echo esc_attr($one_time_product->get_id()); ?>"
-                                        data-one-time-price-html="<?php echo esc_attr($one_time_price_html); ?>"
-                                        data-one-time-url="<?php echo esc_url($one_time_add_url); ?>"
-                                    <?php endif; ?>
+                            <label class="pricing-billing-toggle">
+                                <input
+                                    type="checkbox"
+                                    class="pricing-billing-toggle__input"
+                                    checked
+                                    aria-label="Toggle annual billing"
                                 >
-                                    <div class="pricing-header">
-                                        <div class="icon">
-                                            <?php if (!empty($plan_icon['url'])) : ?>
-                                                <img src="<?php echo esc_url($plan_icon['url']); ?>" alt="">
-                                            <?php endif; ?>
+                                <span class="pricing-billing-toggle__track" aria-hidden="true">
+                                    <span class="pricing-billing-toggle__thumb"></span>
+                                </span>
+                            </label>
 
-                                            <?php if ($plan_name) : ?>
-                                                <h4><?php echo esc_html($plan_name); ?></h4>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <h3><?php echo esc_html($title); ?></h3>
-
-                                        <div class="pricing-wrap">
-                                            <div class="price wphq-plan-price">
-                                                <?php echo wp_kses_post($default_price_html); ?>
-                                            </div>
-
-                                            <div class="per-month wphq-plan-period">
-                                                <p><?php echo $is_one_time ? 'one time' : 'per year'; ?></p>
-                                            </div>
-                                        </div>
-
-                                        <?php if (!$is_one_time) : ?>
-                                            <div class="wphq-annual-website-benefit">
-                                                <strong>Free New Website Included</strong>
-                                                <span>
-                                                    Annual billing includes one website built by WPHQ using one of our customizable starter themes.
-                                                    <a href="<?php echo esc_url(home_url('/free-website-details/')); ?>">Details</a>
-                                                </span>
-                                            </div>
-                                        <?php endif; ?>
-
-                                        <a
-                                            href="<?php echo esc_url($default_add_url); ?>"
-                                            data-quantity="1"
-                                            class="white-btn add_to_cart_button ajax_add_to_cart ad_quick_add_to_cart_listing"
-                                            data-product_id="<?php echo esc_attr($default_product_id); ?>"
-                                            rel="nofollow"
-                                        >Select Plan</a>
-                                    </div>
-
-                                    <div class="content">
-                                        <?php if (!empty($points) && is_array($points)) : ?>
-                                            <ul>
-                                                <?php foreach ($points as $point) : ?>
-                                                    <?php if (!empty($point['point'])) : ?>
-                                                        <li><?php echo wp_kses_post($point['point']); ?></li>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
+                            <span class="pricing-billing-label pricing-billing-label--annual is-active">Annual</span>
+                            <span class="pricing-billing-savings">Save 10% yearly</span>
                         </div>
                     <?php endif; ?>
+
+                    <div class="row table-main">
+                        <?php foreach ($plans as $plan):
+                            $plan_type = isset($plan['plan_type'])
+                                ? sanitize_key((string) $plan['plan_type'])
+                                : 'subscription';
+
+                            $is_one_time = in_array(
+                                $plan_type,
+                                array('one_time', 'one-time', 'onetime', 'one_time_product', 'standalone'),
+                                true
+                            );
+
+                            $get_product_id = static function ($value) {
+                                if ($value instanceof WP_Post) {
+                                    return (int) $value->ID;
+                                }
+
+                                if (is_object($value) && isset($value->ID)) {
+                                    return (int) $value->ID;
+                                }
+
+                                if (is_array($value) && isset($value['ID'])) {
+                                    return (int) $value['ID'];
+                                }
+
+                                return absint($value);
+                            };
+
+                            $monthly_id  = $get_product_id($plan['monthly_product'] ?? 0);
+                            $annual_id   = $get_product_id($plan['annual_product'] ?? 0);
+                            $one_time_id = $get_product_id($plan['one_time_product'] ?? 0);
+
+                            $monthly_product  = $monthly_id ? wc_get_product($monthly_id) : false;
+                            $annual_product   = $annual_id ? wc_get_product($annual_id) : false;
+                            $one_time_product = $one_time_id ? wc_get_product($one_time_id) : false;
+
+                            if ($is_one_time) {
+                                if (!$one_time_product) {
+                                    continue;
+                                }
+
+                                $display_product = $one_time_product;
+                            } else {
+                                /* A subscription row needs at least one valid linked product. */
+                                if (!$monthly_product && !$annual_product) {
+                                    continue;
+                                }
+
+                                $monthly_product = $monthly_product ?: $annual_product;
+                                $annual_product  = $annual_product ?: $monthly_product;
+                                $display_product = $annual_product;
+                            }
+
+                            $display_product_id = $display_product->get_id();
+                            $title              = $display_product->get_name();
+                            $plan_icon          = get_field('plan_icon', $display_product_id);
+                            $plan_name          = get_field('plan_name', $display_product_id);
+                            $points             = get_field('points', $display_product_id);
+
+                            /* If annual variants do not carry the presentation fields, use monthly. */
+                            if (!$is_one_time && $monthly_product) {
+                                $monthly_display_id = $monthly_product->get_id();
+
+                                if (empty($plan_icon)) {
+                                    $plan_icon = get_field('plan_icon', $monthly_display_id);
+                                }
+
+                                if (empty($plan_name)) {
+                                    $plan_name = get_field('plan_name', $monthly_display_id);
+                                }
+
+                                if (empty($points)) {
+                                    $points = get_field('points', $monthly_display_id);
+                                }
+
+                                /* Prefer the monthly/base title when annual product names contain “Annual”. */
+                                $title = $monthly_product->get_name();
+                            }
+
+                            $icon_url = '';
+                            if (is_array($plan_icon) && !empty($plan_icon['url'])) {
+                                $icon_url = $plan_icon['url'];
+                            } elseif (is_numeric($plan_icon)) {
+                                $icon_url = wp_get_attachment_image_url((int) $plan_icon, 'full');
+                            }
+
+                            if ($is_one_time) {
+                                $initial_product_id = $one_time_product->get_id();
+                                $initial_price_html = $one_time_product->get_price_html();
+                                $initial_period     = 'one time';
+                                $initial_url        = $one_time_product->add_to_cart_url();
+
+                                $monthly_price_html = '';
+                                $annual_price_html  = '';
+                                $monthly_url        = '';
+                                $annual_url         = '';
+                            } else {
+                                $initial_product_id = $annual_product->get_id();
+                                $initial_price_html = $annual_product->get_price_html();
+                                $initial_period     = 'per year';
+                                $initial_url        = $annual_product->add_to_cart_url();
+
+                                $monthly_price_html = $monthly_product->get_price_html();
+                                $annual_price_html  = $annual_product->get_price_html();
+                                $monthly_url        = $monthly_product->add_to_cart_url();
+                                $annual_url         = $annual_product->add_to_cart_url();
+                            }
+                        ?>
+
+                            <div
+                                class="col-md-4 pricing-plan-card <?php echo $is_one_time ? 'pricing-plan-card--one-time' : 'pricing-plan-card--subscription'; ?>"
+                                data-aos="flip-left"
+                                data-aos-easing="ease-out-cubic"
+                                data-aos-duration="800"
+                                <?php if (!$is_one_time): ?>
+                                    data-monthly-id="<?php echo esc_attr($monthly_product->get_id()); ?>"
+                                    data-annual-id="<?php echo esc_attr($annual_product->get_id()); ?>"
+                                    data-monthly-price="<?php echo esc_attr(wp_json_encode($monthly_price_html)); ?>"
+                                    data-annual-price="<?php echo esc_attr(wp_json_encode($annual_price_html)); ?>"
+                                    data-monthly-url="<?php echo esc_url($monthly_url); ?>"
+                                    data-annual-url="<?php echo esc_url($annual_url); ?>"
+                                <?php endif; ?>
+                            >
+                                <div class="pricing-header">
+                                    <div class="icon">
+                                        <?php if ($icon_url): ?>
+                                            <img src="<?php echo esc_url($icon_url); ?>" alt="">
+                                        <?php endif; ?>
+
+                                        <?php if ($plan_name): ?>
+                                            <h4><?php echo esc_html($plan_name); ?></h4>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <h3><?php echo esc_html($title); ?></h3>
+
+                                    <div class="pricing-wrap">
+                                        <div class="price"><?php echo wp_kses_post($initial_price_html); ?></div>
+
+                                        <div class="per-month">
+                                            <p><?php echo esc_html($initial_period); ?></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="pricing-annual-benefit"<?php echo $is_one_time ? ' hidden' : ''; ?>>
+                                        <strong>Free new website included</strong>
+                                        <span>
+                                            Annual billing includes one website built by WPHQ using one of our customizable starter themes.
+                                            <a href="/free-website-details/">Details</a>
+                                        </span>
+                                    </div>
+
+                                    <a
+                                        href="<?php echo esc_url($initial_url); ?>"
+                                        data-quantity="1"
+                                        class="white-btn product_type_simple add_to_cart_button ajax_add_to_cart ad_quick_add_to_cart_listing"
+                                        data-product_id="<?php echo esc_attr($initial_product_id); ?>"
+                                        rel="nofollow"
+                                    >Select Plan</a>
+                                </div>
+
+                                <div class="content">
+                                    <?php if (!empty($points) && is_array($points)): ?>
+                                        <ul>
+                                            <?php foreach ($points as $point): ?>
+                                                <?php if (!empty($point['point'])): ?>
+                                                    <li><?php echo wp_kses_post($point['point']); ?></li>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </section>
 
             <style>
-                .wphq-billing-toggle {
+                .pricing-billing-selector {
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     flex-wrap: wrap;
-                    gap: 10px;
-                    margin: 0 0 34px;
+                    gap: 12px;
+                    margin: 0 auto 32px;
                     font-weight: 700;
                 }
 
-                .wphq-billing-switch {
+                .pricing-billing-label {
+                    opacity: .55;
+                    transition: opacity .2s ease;
+                }
+
+                .pricing-billing-label.is-active {
+                    opacity: 1;
+                }
+
+                .pricing-billing-savings {
+                    color: #e86f1c;
+                    font-size: 14px;
+                }
+
+                .pricing-billing-toggle {
+                    display: inline-flex;
+                    cursor: pointer;
+                }
+
+                .pricing-billing-toggle__input {
+                    position: absolute;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+
+                .pricing-billing-toggle__track {
                     position: relative;
+                    display: block;
                     width: 54px;
                     height: 30px;
-                    padding: 0;
-                    border: 0;
                     border-radius: 999px;
-                    background: #c8c8c8;
-                    cursor: pointer;
-                    transition: background-color .2s ease;
+                    background: #8b949b;
+                    transition: background .2s ease;
                 }
 
-                .wphq-billing-switch.is-annual {
-                    background: #e96f20;
-                }
-
-                .wphq-billing-switch__handle {
+                .pricing-billing-toggle__thumb {
                     position: absolute;
                     top: 4px;
                     left: 4px;
@@ -500,118 +535,94 @@ if( have_rows('sections') ):
                     transition: transform .2s ease;
                 }
 
-                .wphq-billing-switch.is-annual .wphq-billing-switch__handle {
+                .pricing-billing-toggle__input:checked + .pricing-billing-toggle__track {
+                    background: #e86f1c;
+                }
+
+                .pricing-billing-toggle__input:checked + .pricing-billing-toggle__track .pricing-billing-toggle__thumb {
                     transform: translateX(24px);
                 }
 
-                .wphq-billing-label {
-                    opacity: .55;
-                    transition: opacity .2s ease;
-                }
-
-                .wphq-billing-label.is-active {
-                    opacity: 1;
-                }
-
-                .wphq-billing-savings {
-                    color: #e96f20;
-                    margin-left: 4px;
-                }
-
-                .wphq-annual-website-benefit {
-                    margin: 16px 0 18px;
-                    padding: 12px 14px;
-                    border: 1px solid rgba(255, 255, 255, .55);
+                .pricing-annual-benefit {
+                    margin: 14px 0 18px;
+                    padding: 12px;
+                    border: 1px solid rgba(232, 111, 28, .45);
                     border-radius: 8px;
-                    text-align: left;
-                    line-height: 1.35;
+                    background: rgba(255, 255, 255, .08);
+                    font-size: 13px;
+                    line-height: 1.45;
                 }
 
-                .wphq-annual-website-benefit strong,
-                .wphq-annual-website-benefit span {
+                .pricing-annual-benefit strong,
+                .pricing-annual-benefit span {
                     display: block;
                 }
 
-                .wphq-annual-website-benefit span {
-                    margin-top: 5px;
-                    font-size: 13px;
-                }
-
-                .wphq-annual-website-benefit a {
+                .pricing-annual-benefit a {
                     color: inherit;
                     text-decoration: underline;
-                }
-
-                .wphq-pricing-plan.is-monthly .wphq-annual-website-benefit {
-                    display: none;
-                }
-
-                @media (max-width: 767px) {
-                    .wphq-billing-savings {
-                        flex-basis: 100%;
-                        text-align: center;
-                    }
                 }
             </style>
 
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                    var toggle = document.querySelector('.wphq-billing-switch');
+                    var pricingTable = document.getElementById('pricing-table');
+                    if (!pricingTable) return;
 
-                    if (!toggle) {
-                        return;
+                    var toggle = pricingTable.querySelector('.pricing-billing-toggle__input');
+                    if (!toggle) return;
+
+                    var monthlyLabel = pricingTable.querySelector('.pricing-billing-label--monthly');
+                    var annualLabel = pricingTable.querySelector('.pricing-billing-label--annual');
+                    var cards = pricingTable.querySelectorAll('.pricing-plan-card--subscription');
+
+                    function decodeHtmlValue(value) {
+                        if (!value) return '';
+
+                        try {
+                            return JSON.parse(value);
+                        } catch (error) {
+                            return value;
+                        }
                     }
 
-                    var monthlyLabel = document.querySelector('.wphq-billing-label--monthly');
-                    var annualLabel = document.querySelector('.wphq-billing-label--annual');
-                    var subscriptionPlans = document.querySelectorAll('.wphq-pricing-plan--subscription');
+                    function updatePlans() {
+                        var useAnnual = toggle.checked;
 
-                    function applyBillingPeriod(useAnnual) {
-                        toggle.classList.toggle('is-annual', useAnnual);
-                        toggle.setAttribute('aria-checked', useAnnual ? 'true' : 'false');
+                        if (monthlyLabel) monthlyLabel.classList.toggle('is-active', !useAnnual);
+                        if (annualLabel) annualLabel.classList.toggle('is-active', useAnnual);
 
-                        if (monthlyLabel) {
-                            monthlyLabel.classList.toggle('is-active', !useAnnual);
-                        }
+                        cards.forEach(function (card) {
+                            var price = card.querySelector('.price');
+                            var period = card.querySelector('.per-month p');
+                            var button = card.querySelector('.add_to_cart_button');
+                            var benefit = card.querySelector('.pricing-annual-benefit');
 
-                        if (annualLabel) {
-                            annualLabel.classList.toggle('is-active', useAnnual);
-                        }
+                            var productId = useAnnual ? card.dataset.annualId : card.dataset.monthlyId;
+                            var productUrl = useAnnual ? card.dataset.annualUrl : card.dataset.monthlyUrl;
+                            var priceHtml = decodeHtmlValue(
+                                useAnnual ? card.dataset.annualPrice : card.dataset.monthlyPrice
+                            );
 
-                        subscriptionPlans.forEach(function (plan) {
-                            var price = plan.querySelector('.wphq-plan-price');
-                            var period = plan.querySelector('.wphq-plan-period p');
-                            var button = plan.querySelector('.add_to_cart_button');
-                            var prefix = useAnnual ? 'annual' : 'monthly';
-                            var productId = plan.getAttribute('data-' + prefix + '-id');
-                            var priceHtml = plan.getAttribute('data-' + prefix + '-price-html');
-                            var url = plan.getAttribute('data-' + prefix + '-url');
+                            if (price) price.innerHTML = priceHtml;
+                            if (period) period.textContent = useAnnual ? 'per year' : 'per month';
 
-                            plan.classList.toggle('is-monthly', !useAnnual);
-
-                            if (price && priceHtml) {
-                                price.innerHTML = priceHtml;
-                            }
-
-                            if (period) {
-                                period.textContent = useAnnual ? 'per year' : 'per month';
-                            }
-
-                            if (button && productId) {
+                            if (button) {
+                                button.dataset.product_id = productId;
                                 button.setAttribute('data-product_id', productId);
-                                button.setAttribute('href', url || '#');
+                                button.href = productUrl;
                             }
+
+                            if (benefit) benefit.hidden = !useAnnual;
                         });
                     }
 
-                    toggle.addEventListener('click', function () {
-                        applyBillingPeriod(toggle.getAttribute('aria-checked') !== 'true');
-                    });
-
-                    // Annual billing is intentionally the default.
-                    applyBillingPeriod(true);
+                    toggle.addEventListener('change', updatePlans);
+                    updatePlans();
                 });
             </script>
+
+            <?php endif; ?>
         <?php endif;
     endwhile;
 endif; ?>
