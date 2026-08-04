@@ -305,6 +305,13 @@ if( have_rows('sections') ):
                                 ? sanitize_key((string) $plan['plan_type'])
                                 : 'subscription';
 
+                            /*
+                             * Optional ACF True/False field on each Plans repeater row.
+                             * Field name: include_free_website
+                             * Default should be off so non-hosting plans do not receive the offer.
+                             */
+                            $include_free_website = !empty($plan['include_free_website']);
+
                             $is_one_time = in_array(
                                 $plan_type,
                                 array('one_time', 'one-time', 'onetime', 'one_time_product', 'standalone'),
@@ -443,13 +450,15 @@ if( have_rows('sections') ):
                                         </div>
                                     </div>
 
-                                    <div class="pricing-annual-benefit"<?php echo $is_one_time ? ' hidden' : ''; ?>>
-                                        <strong>Free new website included</strong>
-                                        <span>
-                                            Annual billing includes one website built by WPHQ using one of our customizable starter themes.
-                                            <a href="/free-website-details/">Details</a>
-                                        </span>
-                                    </div>
+                                    <?php if (!$is_one_time && $include_free_website): ?>
+                                        <div class="pricing-annual-benefit">
+                                            <strong>Free new website included</strong>
+                                            <span>
+                                                Annual billing includes one website built by WPHQ using one of our customizable starter themes.
+                                                <a href="/free-website-details/">Details</a>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
 
                                     <a
                                         href="<?php echo esc_url($initial_url); ?>"
