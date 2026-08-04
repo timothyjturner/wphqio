@@ -251,87 +251,33 @@ if( have_rows('sections') ):
 
         <?php elseif( get_row_layout() == 'pricing_table' ):
             $plans = get_sub_field('plans');
+            $current_row = function_exists('get_row') ? get_row(true) : null;
+            $post_id = get_the_ID();
+            $all_meta = get_post_meta($post_id);
+            $matching_meta = array();
+
+            foreach ($all_meta as $meta_key => $meta_value) {
+                if (strpos($meta_key, 'plans') !== false || strpos($meta_key, 'sections') !== false) {
+                    $matching_meta[$meta_key] = $meta_value;
+                }
+            }
             ?>
 
-            <section id="pricing-table" class="pricing-table">
+            <section id="pricing-table-debug" style="padding:40px 20px;background:#fff7e6;border:3px solid #f47a20;margin:40px 0;font-family:monospace;overflow:auto;">
                 <div class="container">
-                    <div style="background:#fff8e5;border:2px solid #e86f1c;padding:20px;margin:20px 0;font-family:monospace;font-size:14px;line-height:1.5;overflow:auto;">
-                        <h3 style="margin-top:0;">WPHQ Pricing Debug</h3>
-                        <p><strong>Pricing layout reached:</strong> YES</p>
-                        <p><strong>Plans value type:</strong> <?php echo esc_html(gettype($plans)); ?></p>
-                        <p><strong>Plan row count:</strong> <?php echo is_array($plans) ? esc_html((string) count($plans)) : '0'; ?></p>
+                    <h2 style="margin-top:0;">WPHQ Pricing Deep Debug</h2>
+                    <p><strong>Post ID:</strong> <?php echo esc_html($post_id); ?></p>
+                    <p><strong>Current layout:</strong> <?php echo esc_html(get_row_layout()); ?></p>
+                    <p><strong>get_sub_field('plans') type:</strong> <?php echo esc_html(gettype($plans)); ?></p>
+                    <p><strong>get_sub_field('plans') count:</strong> <?php echo is_array($plans) ? esc_html(count($plans)) : '0'; ?></p>
 
-                        <?php if (empty($plans) || !is_array($plans)): ?>
-                            <p style="color:#b00020;"><strong>No plan rows were returned by get_sub_field('plans').</strong></p>
-                            <p>Confirm the Pricing Table row on this page contains saved rows in the Plans repeater.</p>
-                        <?php else: ?>
-                            <?php foreach ($plans as $index => $plan): ?>
-                                <?php
-                                $plan_type_raw = $plan['plan_type'] ?? null;
-                                $monthly_raw   = $plan['monthly_product'] ?? null;
-                                $annual_raw    = $plan['annual_product'] ?? null;
-                                $one_time_raw  = $plan['one_time_product'] ?? null;
+                    <h3>Current Flexible Content Row</h3>
+                    <pre style="white-space:pre-wrap;background:#fff;padding:15px;border:1px solid #ddd;"><?php echo esc_html(print_r($current_row, true)); ?></pre>
 
-                                $debug_product_id = static function ($value) {
-                                    if ($value instanceof WP_Post) return (int) $value->ID;
-                                    if (is_object($value) && isset($value->ID)) return (int) $value->ID;
-                                    if (is_array($value)) {
-                                        if (isset($value['ID'])) return (int) $value['ID'];
-                                        if (isset($value['id'])) return (int) $value['id'];
-                                    }
-                                    return is_numeric($value) ? (int) $value : 0;
-                                };
+                    <h3>Matching Raw Post Meta Keys</h3>
+                    <pre style="white-space:pre-wrap;background:#fff;padding:15px;border:1px solid #ddd;"><?php echo esc_html(print_r($matching_meta, true)); ?></pre>
 
-                                $monthly_id  = $debug_product_id($monthly_raw);
-                                $annual_id   = $debug_product_id($annual_raw);
-                                $one_time_id = $debug_product_id($one_time_raw);
-
-                                $monthly_wc  = (function_exists('wc_get_product') && $monthly_id) ? wc_get_product($monthly_id) : false;
-                                $annual_wc   = (function_exists('wc_get_product') && $annual_id) ? wc_get_product($annual_id) : false;
-                                $one_time_wc = (function_exists('wc_get_product') && $one_time_id) ? wc_get_product($one_time_id) : false;
-                                ?>
-
-                                <div style="border-top:1px solid #d9b56d;margin-top:16px;padding-top:16px;">
-                                    <h4 style="margin:0 0 10px;">Plan Row <?php echo esc_html((string) ($index + 1)); ?></h4>
-                                    <p><strong>plan_type raw value:</strong> <code><?php echo esc_html(var_export($plan_type_raw, true)); ?></code></p>
-                                    <p><strong>Available row keys:</strong> <code><?php echo esc_html(implode(', ', array_keys($plan))); ?></code></p>
-
-                                    <p><strong>monthly_product:</strong>
-                                        raw type=<code><?php echo esc_html(gettype($monthly_raw)); ?></code>,
-                                        ID=<code><?php echo esc_html((string) $monthly_id); ?></code>,
-                                        WooCommerce=<?php echo $monthly_wc ? '<span style="color:green;">FOUND</span>' : '<span style="color:#b00020;">NOT FOUND</span>'; ?>
-                                        <?php if ($monthly_wc): ?>,
-                                            name=<code><?php echo esc_html($monthly_wc->get_name()); ?></code>,
-                                            type=<code><?php echo esc_html($monthly_wc->get_type()); ?></code>,
-                                            price=<code><?php echo esc_html((string) $monthly_wc->get_price()); ?></code>
-                                        <?php endif; ?>
-                                    </p>
-
-                                    <p><strong>annual_product:</strong>
-                                        raw type=<code><?php echo esc_html(gettype($annual_raw)); ?></code>,
-                                        ID=<code><?php echo esc_html((string) $annual_id); ?></code>,
-                                        WooCommerce=<?php echo $annual_wc ? '<span style="color:green;">FOUND</span>' : '<span style="color:#b00020;">NOT FOUND</span>'; ?>
-                                        <?php if ($annual_wc): ?>,
-                                            name=<code><?php echo esc_html($annual_wc->get_name()); ?></code>,
-                                            type=<code><?php echo esc_html($annual_wc->get_type()); ?></code>,
-                                            price=<code><?php echo esc_html((string) $annual_wc->get_price()); ?></code>
-                                        <?php endif; ?>
-                                    </p>
-
-                                    <p><strong>one_time_product:</strong>
-                                        raw type=<code><?php echo esc_html(gettype($one_time_raw)); ?></code>,
-                                        ID=<code><?php echo esc_html((string) $one_time_id); ?></code>,
-                                        WooCommerce=<?php echo $one_time_wc ? '<span style="color:green;">FOUND</span>' : '<span style="color:#b00020;">NOT FOUND</span>'; ?>
-                                        <?php if ($one_time_wc): ?>,
-                                            name=<code><?php echo esc_html($one_time_wc->get_name()); ?></code>,
-                                            type=<code><?php echo esc_html($one_time_wc->get_type()); ?></code>,
-                                            price=<code><?php echo esc_html((string) $one_time_wc->get_price()); ?></code>
-                                        <?php endif; ?>
-                                    </p>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
+                    <p style="color:#a00;"><strong>Important:</strong> This page intentionally outputs raw ACF diagnostic data. Remove this file after troubleshooting.</p>
                 </div>
             </section>
         <?php endif;
