@@ -454,7 +454,7 @@ if( have_rows('sections') ):
                                     <a
                                         href="<?php echo esc_url($initial_url); ?>"
                                         data-quantity="1"
-                                        class="white-btn product_type_simple add_to_cart_button ajax_add_to_cart ad_quick_add_to_cart_listing"
+                                        class="white-btn wphq-select-plan-button"
                                         data-product_id="<?php echo esc_attr($initial_product_id); ?>"
                                         rel="nofollow"
                                     >Select Plan</a>
@@ -544,7 +544,7 @@ if( have_rows('sections') ):
                 }
 
                 .pricing-annual-benefit {
-                    margin: 14px 0 18px;
+                    margin: 14px 0 36px;
                     padding: 12px;
                     border: 1px solid rgba(232, 111, 28, .45);
                     border-radius: 8px;
@@ -561,6 +561,12 @@ if( have_rows('sections') ):
                 .pricing-annual-benefit a {
                     color: inherit;
                     text-decoration: underline;
+                }
+                .subscription-details {
+                    display: none;
+                }
+                section.pricing-table .col-md-4 .pricing-header .pricing-wrap {
+                    margin-bottom: 16px;
                 }
             </style>
 
@@ -595,7 +601,7 @@ if( have_rows('sections') ):
                         cards.forEach(function (card) {
                             var price = card.querySelector('.price');
                             var period = card.querySelector('.per-month p');
-                            var button = card.querySelector('.add_to_cart_button');
+                            var button = card.querySelector('.wphq-select-plan-button');
                             var benefit = card.querySelector('.pricing-annual-benefit');
 
                             var productId = useAnnual ? card.dataset.annualId : card.dataset.monthlyId;
@@ -608,8 +614,8 @@ if( have_rows('sections') ):
                             if (period) period.textContent = useAnnual ? 'per year' : 'per month';
 
                             if (button) {
-                                button.dataset.product_id = productId;
-                                button.setAttribute('data-product_id', productId);
+                                button.dataset.productId = productId;
+                                button.setAttribute('data-product-id', productId);
                                 button.href = productUrl;
                             }
 
@@ -618,6 +624,17 @@ if( have_rows('sections') ):
                     }
 
                     toggle.addEventListener('change', updatePlans);
+
+                    pricingTable.addEventListener('click', function (event) {
+                        var button = event.target.closest('.wphq-select-plan-button');
+                        if (!button) return;
+
+                        // This is intentionally a normal WooCommerce add-to-cart request.
+                        // Avoid the theme/side-cart AJAX handlers, which error after the
+                        // product ID is changed dynamically by the billing toggle.
+                        event.stopPropagation();
+                    }, true);
+
                     updatePlans();
                 });
             </script>
