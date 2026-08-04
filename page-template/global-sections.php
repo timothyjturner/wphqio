@@ -575,7 +575,7 @@ if( have_rows('sections') ):
                     display: none;
                 }
                 section.pricing-table .col-md-4 .pricing-header .pricing-wrap {
-                    margin-bottom: 16px;
+                    margin-bottom: 32px;
                 }
             </style>
 
