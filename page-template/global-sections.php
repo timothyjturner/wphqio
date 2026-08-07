@@ -101,7 +101,7 @@ if( have_rows('sections') ):
                     <?php if($tiles): ?>
                         <div class="row">
                             <?php foreach($tiles as $tile): ?>
-                                <div class="col-md-4 card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="800">
+                                <div class="col-md-3 card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="800">
                                     <div class="inner">
                                         <img src="<?=$tile['icon']['url']?>">
 
