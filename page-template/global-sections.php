@@ -33,17 +33,11 @@ get_header(); ?>
 
                         
         <?php
-        if( is_page( 'seo-performance-subscriptions' ) ) {?>
+        if( is_page( 'seo-performance-subscriptions' ) || is_page( 'wordpress-hosting-maintenance' ) || is_page( 'shopify' ) ) {?>
                         
      <div class="btn-dropdown-wrapper">
      <a class="primary-btn2 <?php $title ?>" href="#simple-content"><?=$buttons['button']['title']?></a>
-     </div>
-                        
-  <?php
-  }elseif ( is_page( 'wordpress-hosting-maintenance' )) { ?>                
-            <div class="btn-dropdown-wrapper">
-     <a class="primary-btn2 <?php $title ?>" href="#simple-content"><?=$buttons['button']['title']?></a>
-     </div>         
+     </div>      
                         
   <?php
    }else {
