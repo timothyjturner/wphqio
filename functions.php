@@ -214,9 +214,7 @@ function wphq_maybe_send_free_website_email( $order_id ) {
                 padding:12px 20px;
                 border-radius:5px;
                 font-weight:bold;
-           ">
-            View Your Website Guide
-        </a>
+           ">View Your Website Guide</a>
     </p>
 
     <p>
