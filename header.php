@@ -29,6 +29,8 @@
 
 <body <?php body_class(); ?>>
 
+<?php wp_body_open(); ?>
+
 <?php $header = get_field('header', 'option'); ?>
 
 <header class="global-header">
