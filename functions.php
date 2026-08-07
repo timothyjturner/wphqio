@@ -68,3 +68,265 @@ function save_terms_and_subscription_checkbox($order_id) {
         update_post_meta($order_id, '_terms_and_subscription', 'yes');
     }
 }
+
+
+/**
+ * WPHQ Free Website Onboarding Email
+ *
+ * Sends a separate email after the INITIAL purchase of a WooCommerce
+ * product that has the ACF "includes_free_website" flag enabled.
+ *
+ * Subscription renewal orders are excluded.
+ * Each order can trigger this email only once.
+ */
+
+add_action( 'woocommerce_payment_complete', 'wphq_maybe_send_free_website_email', 20 );
+add_action( 'woocommerce_order_status_processing', 'wphq_maybe_send_free_website_email', 20 );
+
+function wphq_maybe_send_free_website_email( $order_id ) {
+
+    $order = wc_get_order( $order_id );
+
+    if ( ! $order ) {
+        return;
+    }
+
+    /*
+     * Do not send twice.
+     *
+     * We hook both payment_complete and processing for reliability,
+     * so this order-level flag prevents duplicate emails.
+     */
+    if ( $order->get_meta( '_wphq_free_website_email_sent' ) ) {
+        return;
+    }
+
+    /*
+     * IMPORTANT:
+     * Do not send this email for WooCommerce Subscription renewals.
+     */
+    if (
+        function_exists( 'wcs_order_contains_renewal' ) &&
+        wcs_order_contains_renewal( $order )
+    ) {
+        return;
+    }
+
+    /*
+     * Check purchased products.
+     */
+    $qualifies = false;
+
+    foreach ( $order->get_items() as $item ) {
+
+        $product = $item->get_product();
+
+        if ( ! $product ) {
+            continue;
+        }
+
+        $product_id = $product->get_id();
+        $parent_id  = $product->get_parent_id();
+
+        /*
+         * Check the purchased product first.
+         */
+        $includes_free_website = get_field(
+            'includes_free_website',
+            $product_id
+        );
+
+        /*
+         * If this is ever a variation and the setting isn't on the
+         * variation itself, fall back to the parent product.
+         */
+        if ( ! $includes_free_website && $parent_id ) {
+            $includes_free_website = get_field(
+                'includes_free_website',
+                $parent_id
+            );
+        }
+
+        if ( $includes_free_website ) {
+            $qualifies = true;
+            break;
+        }
+    }
+
+    if ( ! $qualifies ) {
+        return;
+    }
+
+    /*
+     * Customer email address.
+     */
+    $to = $order->get_billing_email();
+
+    if ( ! is_email( $to ) ) {
+        return;
+    }
+
+    $first_name = $order->get_billing_first_name();
+
+    $subject = 'Your Free WPHQ Website – Let’s Get Started';
+
+    /*
+     * Build HTML email content.
+     */
+    ob_start();
+    ?>
+
+    <p>
+        <?php
+        if ( $first_name ) {
+            echo 'Hi ' . esc_html( $first_name ) . ',';
+        } else {
+            echo 'Hello,';
+        }
+        ?>
+    </p>
+
+    <p>
+        Thanks for choosing WPHQ! Your new plan includes a
+        <strong>professionally built WordPress website at no additional cost.</strong>
+    </p>
+
+    <p>
+        Getting started is easy, and we'll be available to help you throughout
+        the entire process.
+    </p>
+
+    <h2>Here's What to Do Next</h2>
+
+    <p>
+        <strong>1. Review the website guide</strong><br>
+        Our quick guide explains the entire process and lets you preview the
+        available WPHQ starter themes.
+    </p>
+
+    <p>
+        <a href="https://wphq.io/free-website-details/"
+           style="
+                display:inline-block;
+                background:#e86f1c;
+                color:#ffffff;
+                text-decoration:none;
+                padding:12px 20px;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+            View Your Website Guide
+        </a>
+    </p>
+
+    <p>
+        <strong>2. Complete the Website Builder</strong><br>
+        When you're ready, tell us about your business using our guided website
+        request form:
+    </p>
+
+    <p>
+        <strong>Builder:</strong><br>
+        <a href="https://build.launch.wphq.io/">
+            https://build.launch.wphq.io/
+        </a>
+    </p>
+
+    <p>
+        <strong>Password:</strong> build
+    </p>
+
+    <p>
+        The form will ask for information such as your business name,
+        services or products, logo, images, contact information, and preferred
+        starter theme. Don't worry if you don't have an answer for every
+        optional field.
+    </p>
+
+    <p>
+        <strong>3. We'll build your website.</strong><br>
+        Once your request is submitted, WPHQ will prepare your website and
+        contact you by email when your first version is ready to review.
+    </p>
+
+    <p>
+        <strong>4. Review it and send us your feedback.</strong><br>
+        Your complimentary website includes up to
+        <strong>one hour of edits</strong> so we can help get everything
+        looking right. Additional customization is available at our standard
+        hourly rate if needed.
+    </p>
+
+    <p>
+        <strong>5. We'll help you launch.</strong><br>
+        If you already own a domain, we'll show you how to connect it to WPHQ.
+        If you're not comfortable changing your domain settings, just let us
+        know and we'll help.
+    </p>
+
+    <hr style="margin:30px 0;border:0;border-top:1px solid #dddddd;">
+
+    <h2>We're Here to Help</h2>
+
+    <p>
+        You don't need to be technical to use this service. If you have
+        questions at any point, simply reply to this email and we'll help you
+        through the next step.
+    </p>
+
+    <p>
+        We're looking forward to building your new website!
+    </p>
+
+    <p>
+        — The WPHQ Team
+    </p>
+
+    <?php
+
+    $message = ob_get_clean();
+
+    /*
+     * Run the content through the normal WooCommerce email wrapper
+     * so it uses WooCommerce's email branding.
+     */
+    $mailer = WC()->mailer();
+
+    $message = $mailer->wrap_message(
+        'Your Free Website Is Included',
+        $message
+    );
+
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8'
+    );
+
+    /*
+     * Send using the WooCommerce mailer.
+     */
+    $sent = $mailer->send(
+        $to,
+        $subject,
+        $message,
+        $headers
+    );
+
+    /*
+     * Mark the order only after attempting the send.
+     *
+     * This prevents payment_complete + processing from generating
+     * two emails for the same initial order.
+     */
+    if ( $sent ) {
+        $order->update_meta_data(
+            '_wphq_free_website_email_sent',
+            current_time( 'mysql' )
+        );
+
+        $order->save();
+
+        $order->add_order_note(
+            'WPHQ free website onboarding email sent to customer.'
+        );
+    }
+}
