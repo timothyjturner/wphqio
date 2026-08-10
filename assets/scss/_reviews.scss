@@ -111,25 +111,6 @@
 	margin-bottom: 3px;
 }
 
-.wphq-upwork-btn {
-	flex: 0 0 auto;
-	display: inline-block;
-	padding: 11px 18px;
-	border: 2px solid #ef7622;
-	border-radius: 7px;
-	background: #fff;
-	color: #d96517 !important;
-	text-decoration: none !important;
-	font-size: 14px;
-	font-weight: 700;
-	white-space: nowrap;
-}
-
-.wphq-upwork-btn:hover {
-	background: #ef7622;
-	color: #fff !important;
-}
-
 .wphq-review-mini {
 	max-width: 1180px;
 	margin: 55px auto;
@@ -176,6 +157,24 @@
 	letter-spacing: .06em;
 }
 
+.wphq-review-copy {
+    margin: 0;
+}
+
+.wphq-review-meta {margin-top: 16px;}
+
+.wphq-review-meta br {
+    display: none;
+}
+
+.wphq-upwork-btn br {
+    display: none;
+}
+
+.wphq-upwork-proof br {
+    display: none;
+}
+
 @media (max-width: 900px) {
 	.wphq-review-grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -217,12 +216,6 @@
 		flex-direction: column;
 		align-items: flex-start;
 		padding: 22px;
-	}
-
-	.wphq-upwork-btn {
-		width: 100%;
-		text-align: center;
-		box-sizing: border-box;
 	}
 
 	.wphq-review-mini {
