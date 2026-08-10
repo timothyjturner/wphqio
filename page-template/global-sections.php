@@ -157,6 +157,8 @@ if( have_rows('sections') ):
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
+                            <h4 style="padding-top: 15px;padding-left: 5px;color:white;">Have a quick question? Call <a href="tel:614-916-6243" style="text-decoration: underline;color: white;">614-916-6243</a>. We are happy to help!</h4>
+
                         </div>
 
                         <div class="col-md-4">
