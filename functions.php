@@ -102,8 +102,7 @@ function wphq_maybe_send_free_website_email( $order_id ) {
     }
 
     /*
-     * IMPORTANT:
-     * Do not send this email for WooCommerce Subscription renewals.
+     * Do not send this onboarding email for subscription renewals.
      */
     if (
         function_exists( 'wcs_order_contains_renewal' ) &&
@@ -113,7 +112,7 @@ function wphq_maybe_send_free_website_email( $order_id ) {
     }
 
     /*
-     * Check purchased products.
+     * Check purchased products for the ACF free-website flag.
      */
     $qualifies = false;
 
@@ -129,7 +128,7 @@ function wphq_maybe_send_free_website_email( $order_id ) {
         $parent_id  = $product->get_parent_id();
 
         /*
-         * Check the purchased product first.
+         * Check purchased product first.
          */
         $includes_free_website = get_field(
             'includes_free_website',
@@ -137,8 +136,7 @@ function wphq_maybe_send_free_website_email( $order_id ) {
         );
 
         /*
-         * If this is ever a variation and the setting isn't on the
-         * variation itself, fall back to the parent product.
+         * If this is a variation, fall back to the parent product.
          */
         if ( ! $includes_free_website && $parent_id ) {
             $includes_free_website = get_field(
@@ -188,88 +186,105 @@ function wphq_maybe_send_free_website_email( $order_id ) {
 
     <p>
         Thanks for choosing WPHQ! Your new plan includes a
-        <strong>professionally built WordPress website at no additional cost.</strong>
+        <strong>professionally built WordPress starter website at no additional cost.</strong>
     </p>
 
     <p>
-        Getting started is easy, and we'll be available to help you throughout
-        the entire process.
+        Getting started is simple. We've put together a step-by-step guide
+        that walks you through everything from choosing your design through launch.
     </p>
 
-    <h2>Here's What to Do Next</h2>
-
-    <p>
-        <strong>1. Review the website guide</strong><br>
-        Our quick guide explains the entire process and lets you preview the
-        available WPHQ starter themes.
-    </p>
-
-    <p>
-        <a href="https://wphq.io/free-website-details/"
+    <p style="margin:24px 0;">
+        <a href="https://wphq.io/website-build-process/"
            style="
                 display:inline-block;
                 background:#e86f1c;
                 color:#ffffff;
                 text-decoration:none;
-                padding:12px 20px;
-                border-radius:5px;
+                padding:13px 22px;
+                border-radius:6px;
                 font-weight:bold;
-           ">View Your Website Guide</a>
+           ">
+            View Your Website Build Guide
+        </a>
+    </p>
+
+    <h2 style="margin-top:30px;">
+        Ready to Jump Right In?
+    </h2>
+
+    <p>
+        You can also go directly to the WPHQ Website Builder and submit
+        the information we'll use to create your website.
     </p>
 
     <p>
-        <strong>2. Complete the Website Builder</strong><br>
-        When you're ready, tell us about your business using our guided website
-        request form:
-    </p>
-
-    <p>
-        <strong>Builder:</strong><br>
+        <strong>Website Builder:</strong><br>
         <a href="https://build.launch.wphq.io/">
             https://build.launch.wphq.io/
         </a>
     </p>
 
     <p>
-        <strong>Password:</strong> build
+        <strong>Password:</strong>
+        <span style="
+            display:inline-block;
+            margin-left:4px;
+            padding:3px 8px;
+            background:#f3f3f3;
+            border:1px solid #dddddd;
+            border-radius:4px;
+            font-family:monospace;
+        ">
+            build
+        </span>
     </p>
 
     <p>
-        The form will ask for information such as your business name,
-        services or products, logo, images, contact information, and preferred
-        starter theme. Don't worry if you don't have an answer for every
-        optional field.
+        The builder will ask for details such as your business name,
+        services or products, logo, branding, images, contact information,
+        and preferred starter design.
     </p>
 
     <p>
-        <strong>3. We'll build your website.</strong><br>
-        Once your request is submitted, WPHQ will prepare your website and
-        contact you by email when your first version is ready to review.
+        <strong>Don't have everything ready?</strong>
+        That's okay. Provide what you have and we'll help you through anything
+        you're unsure about.
+    </p>
+
+    <h2 style="margin-top:30px;">
+        What Happens After You Submit?
+    </h2>
+
+    <p>
+        WPHQ will prepare your website and contact you when your first version
+        is ready to review.
     </p>
 
     <p>
-        <strong>4. Review it and send us your feedback.</strong><br>
-        Your complimentary website includes up to
-        <strong>one hour of edits</strong> so we can help get everything
-        looking right. Additional customization is available at our standard
-        hourly rate if needed.
+        Your starter website includes up to
+        <strong>one hour of complimentary edits</strong>
+        so we can make reasonable adjustments before launch.
     </p>
 
     <p>
-        <strong>5. We'll help you launch.</strong><br>
-        If you already own a domain, we'll show you how to connect it to WPHQ.
-        If you're not comfortable changing your domain settings, just let us
-        know and we'll help.
+        We'll also help you get your domain connected when the website is ready
+        to go live.
     </p>
 
     <hr style="margin:30px 0;border:0;border-top:1px solid #dddddd;">
 
-    <h2>We're Here to Help</h2>
+    <h2>Need Help?</h2>
 
     <p>
-        You don't need to be technical to use this service. If you have
-        questions at any point, simply reply to this email and we'll help you
-        through the next step.
+        You don't need to be technical to use this service.
+        If you have questions at any point, simply reply to this email
+        and we'll help you through the next step.
+    </p>
+
+    <p>
+        You can also call WPHQ at
+        <a href="tel:+16149166243">614-916-6243</a>.
     </p>
 
     <p>
@@ -310,12 +325,13 @@ function wphq_maybe_send_free_website_email( $order_id ) {
     );
 
     /*
-     * Mark the order only after attempting the send.
+     * Mark the order only after successful send.
      *
      * This prevents payment_complete + processing from generating
      * two emails for the same initial order.
      */
     if ( $sent ) {
+
         $order->update_meta_data(
             '_wphq_free_website_email_sent',
             current_time( 'mysql' )
