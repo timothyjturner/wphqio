@@ -471,7 +471,7 @@ if( have_rows('sections') ):
                                         <ul>
                                             <?php foreach ($points as $point): ?>
                                                 <?php if (!empty($point['point'])): ?>
-                                                    <li><?php echo wp_kses_post($point['point']); ?></li>
+                                                    <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
                                         </ul>
