@@ -71,39 +71,283 @@ function save_terms_and_subscription_checkbox($order_id) {
 
 
 /**
- * WPHQ Free Website Onboarding Email
+ * =========================================================
+ * WPHQ CUSTOM PURCHASE BENEFIT + ONBOARDING EMAIL SYSTEM
+ * =========================================================
  *
- * Sends a separate email after the INITIAL purchase of a WooCommerce
- * product that has the ACF "includes_free_website" flag enabled.
+ * Replaces the old product-level "includes_free_website" email trigger.
+ * The benefit is now selected at the PAGE / PRICING-ROW level and travels
+ * with the specific WooCommerce purchase as signed cart-item data.
  *
- * Subscription renewal orders are excluded.
- * Each order can trigger this email only once.
+ * This lets the same annual WooCommerce product provide ONE contextual
+ * acquisition benefit (free website, recovery, speed work, migration, etc.)
+ * depending on the page from which the customer purchases it.
  */
 
-add_action( 'woocommerce_payment_complete', 'wphq_maybe_send_free_website_email', 20 );
-add_action( 'woocommerce_order_status_processing', 'wphq_maybe_send_free_website_email', 20 );
+/**
+ * Register the admin-only Custom Product Emails post type.
+ */
+function wphq_register_custom_product_email_cpt() {
+    $labels = array(
+        'name'               => 'Custom Product Emails',
+        'singular_name'      => 'Custom Product Email',
+        'menu_name'          => 'Custom Product Emails',
+        'add_new'            => 'Add New',
+        'add_new_item'       => 'Add Custom Product Email',
+        'edit_item'          => 'Edit Custom Product Email',
+        'new_item'           => 'New Custom Product Email',
+        'view_item'          => 'View Custom Product Email',
+        'search_items'       => 'Search Custom Product Emails',
+        'not_found'          => 'No custom product emails found.',
+        'not_found_in_trash' => 'No custom product emails found in Trash.',
+    );
 
-function wphq_maybe_send_free_website_email( $order_id ) {
+    register_post_type(
+        'wphq_product_email',
+        array(
+            'labels'              => $labels,
+            'public'              => false,
+            'publicly_queryable'  => false,
+            'exclude_from_search' => true,
+            'show_ui'             => true,
+            'show_in_menu'        => true,
+            'show_in_nav_menus'   => false,
+            'show_in_admin_bar'   => false,
+            'menu_icon'           => 'dashicons-email-alt2',
+            'supports'            => array( 'title', 'editor' ),
+            'has_archive'         => false,
+            'rewrite'             => false,
+            'query_var'           => false,
+            'show_in_rest'        => false,
+        )
+    );
+}
+add_action( 'init', 'wphq_register_custom_product_email_cpt' );
 
+/**
+ * Add email configuration fields to each Custom Product Email.
+ * The main WordPress editor is used for the email body.
+ */
+function wphq_add_custom_product_email_meta_box() {
+    add_meta_box(
+        'wphq-product-email-settings',
+        'Purchase Email Settings',
+        'wphq_render_custom_product_email_meta_box',
+        'wphq_product_email',
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'wphq_add_custom_product_email_meta_box' );
+
+function wphq_render_custom_product_email_meta_box( $post ) {
+    wp_nonce_field( 'wphq_save_product_email_settings', 'wphq_product_email_nonce' );
+
+    $subject  = get_post_meta( $post->ID, '_wphq_email_subject', true );
+    $heading  = get_post_meta( $post->ID, '_wphq_email_heading', true );
+    $cta_text = get_post_meta( $post->ID, '_wphq_email_cta_text', true );
+    $cta_url  = get_post_meta( $post->ID, '_wphq_email_cta_url', true );
+    ?>
+
+    <p>
+        <label for="wphq_email_subject"><strong>Email Subject</strong></label><br>
+        <input type="text" id="wphq_email_subject" name="wphq_email_subject"
+               value="<?php echo esc_attr( $subject ); ?>" class="widefat"
+               placeholder="Your WPHQ Service – Let's Get Started">
+    </p>
+
+    <p>
+        <label for="wphq_email_heading"><strong>WooCommerce Email Heading</strong></label><br>
+        <input type="text" id="wphq_email_heading" name="wphq_email_heading"
+               value="<?php echo esc_attr( $heading ); ?>" class="widefat"
+               placeholder="Your Included Service Is Ready">
+    </p>
+
+    <p>
+        <label for="wphq_email_cta_text"><strong>CTA Button Text</strong></label><br>
+        <input type="text" id="wphq_email_cta_text" name="wphq_email_cta_text"
+               value="<?php echo esc_attr( $cta_text ); ?>" class="widefat"
+               placeholder="Start Your Service Request">
+    </p>
+
+    <p>
+        <label for="wphq_email_cta_url"><strong>CTA Button URL</strong></label><br>
+        <input type="url" id="wphq_email_cta_url" name="wphq_email_cta_url"
+               value="<?php echo esc_attr( $cta_url ); ?>" class="widefat"
+               placeholder="https://wphq.io/service-request/">
+    </p>
+
+    <p class="description">
+        Use the main editor above for the email body. Supported placeholders in the subject,
+        heading, body, and CTA URL: <code>{first_name}</code>, <code>{order_number}</code>,
+        <code>{benefit_key}</code>.
+    </p>
+
+    <?php
+}
+
+function wphq_save_custom_product_email_meta( $post_id ) {
+    if ( get_post_type( $post_id ) !== 'wphq_product_email' ) {
+        return;
+    }
+
+    if (
+        empty( $_POST['wphq_product_email_nonce'] ) ||
+        ! wp_verify_nonce(
+            sanitize_text_field( wp_unslash( $_POST['wphq_product_email_nonce'] ) ),
+            'wphq_save_product_email_settings'
+        )
+    ) {
+        return;
+    }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    $text_fields = array(
+        '_wphq_email_subject'  => 'wphq_email_subject',
+        '_wphq_email_heading'  => 'wphq_email_heading',
+        '_wphq_email_cta_text' => 'wphq_email_cta_text',
+    );
+
+    foreach ( $text_fields as $meta_key => $post_key ) {
+        $value = isset( $_POST[ $post_key ] )
+            ? sanitize_text_field( wp_unslash( $_POST[ $post_key ] ) )
+            : '';
+
+        update_post_meta( $post_id, $meta_key, $value );
+    }
+
+    $cta_url = isset( $_POST['wphq_email_cta_url'] )
+        ? esc_url_raw( wp_unslash( $_POST['wphq_email_cta_url'] ) )
+        : '';
+
+    update_post_meta( $post_id, '_wphq_email_cta_url', $cta_url );
+}
+add_action( 'save_post_wphq_product_email', 'wphq_save_custom_product_email_meta' );
+
+/**
+ * Create a signed benefit context so a visitor cannot swap arbitrary email IDs
+ * or benefit keys into an add-to-cart URL.
+ */
+function wphq_build_benefit_signature( $product_id, $email_id, $benefit_key ) {
+    $payload = absint( $product_id ) . '|' . absint( $email_id ) . '|' . sanitize_key( $benefit_key );
+
+    return hash_hmac( 'sha256', $payload, wp_salt( 'auth' ) );
+}
+
+function wphq_is_valid_custom_purchase_email( $email_id ) {
+    $email_id = absint( $email_id );
+
+    return (
+        $email_id > 0 &&
+        get_post_type( $email_id ) === 'wphq_product_email' &&
+        get_post_status( $email_id ) === 'publish'
+    );
+}
+
+/**
+ * Capture the signed page-level benefit context when WooCommerce adds the
+ * selected annual plan to the cart.
+ */
+function wphq_capture_purchase_benefit_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
+    $email_id    = isset( $_REQUEST['wphq_purchase_email'] )
+        ? absint( wp_unslash( $_REQUEST['wphq_purchase_email'] ) )
+        : 0;
+    $benefit_key = isset( $_REQUEST['wphq_benefit_key'] )
+        ? sanitize_key( wp_unslash( $_REQUEST['wphq_benefit_key'] ) )
+        : '';
+    $signature   = isset( $_REQUEST['wphq_benefit_sig'] )
+        ? sanitize_text_field( wp_unslash( $_REQUEST['wphq_benefit_sig'] ) )
+        : '';
+
+    if ( ! $email_id || ! $benefit_key || ! $signature ) {
+        return $cart_item_data;
+    }
+
+    $actual_product_id = $variation_id ? absint( $variation_id ) : absint( $product_id );
+    $expected          = wphq_build_benefit_signature( $actual_product_id, $email_id, $benefit_key );
+
+    if ( ! hash_equals( $expected, $signature ) ) {
+        return $cart_item_data;
+    }
+
+    if ( ! wphq_is_valid_custom_purchase_email( $email_id ) ) {
+        return $cart_item_data;
+    }
+
+    $cart_item_data['wphq_purchase_email_id'] = $email_id;
+    $cart_item_data['wphq_benefit_key']       = $benefit_key;
+
+    /*
+     * Keep identical WooCommerce products with different acquisition benefits
+     * as separate cart lines when necessary.
+     */
+    $cart_item_data['wphq_benefit_context'] = md5(
+        $actual_product_id . '|' . $email_id . '|' . $benefit_key
+    );
+
+    return $cart_item_data;
+}
+add_filter( 'woocommerce_add_cart_item_data', 'wphq_capture_purchase_benefit_cart_item_data', 20, 3 );
+
+/**
+ * Persist the benefit context on the ORDER ITEM, not on the product itself.
+ */
+function wphq_store_purchase_benefit_on_order_item( $item, $cart_item_key, $values, $order ) {
+    if ( empty( $values['wphq_purchase_email_id'] ) ) {
+        return;
+    }
+
+    $email_id    = absint( $values['wphq_purchase_email_id'] );
+    $benefit_key = ! empty( $values['wphq_benefit_key'] )
+        ? sanitize_key( $values['wphq_benefit_key'] )
+        : '';
+
+    if ( ! wphq_is_valid_custom_purchase_email( $email_id ) ) {
+        return;
+    }
+
+    $item->add_meta_data( '_wphq_purchase_email_id', $email_id, true );
+    $item->add_meta_data( '_wphq_benefit_key', $benefit_key, true );
+}
+add_action( 'woocommerce_checkout_create_order_line_item', 'wphq_store_purchase_benefit_on_order_item', 20, 4 );
+
+/**
+ * Replace simple placeholders in custom email content.
+ */
+function wphq_replace_purchase_email_placeholders( $value, $order, $benefit_key ) {
+    $first_name = $order->get_billing_first_name();
+
+    return strtr(
+        (string) $value,
+        array(
+            '{first_name}'    => $first_name ? $first_name : 'there',
+            '{order_number}'  => $order->get_order_number(),
+            '{benefit_key}'   => $benefit_key,
+        )
+    );
+}
+
+/**
+ * Send each configured contextual purchase email once after the INITIAL order.
+ */
+add_action( 'woocommerce_payment_complete', 'wphq_maybe_send_custom_purchase_emails', 20 );
+add_action( 'woocommerce_order_status_processing', 'wphq_maybe_send_custom_purchase_emails', 20 );
+
+function wphq_maybe_send_custom_purchase_emails( $order_id ) {
     $order = wc_get_order( $order_id );
 
     if ( ! $order ) {
         return;
     }
 
-    /*
-     * Do not send twice.
-     *
-     * We hook both payment_complete and processing for reliability,
-     * so this order-level flag prevents duplicate emails.
-     */
-    if ( $order->get_meta( '_wphq_free_website_email_sent' ) ) {
-        return;
-    }
-
-    /*
-     * Do not send this onboarding email for subscription renewals.
-     */
+    /* Never send acquisition/onboarding benefit emails for renewals. */
     if (
         function_exists( 'wcs_order_contains_renewal' ) &&
         wcs_order_contains_renewal( $order )
@@ -111,238 +355,132 @@ function wphq_maybe_send_free_website_email( $order_id ) {
         return;
     }
 
-    /*
-     * Check purchased products for the ACF free-website flag.
-     */
-    $qualifies = false;
-
-    foreach ( $order->get_items() as $item ) {
-
-        $product = $item->get_product();
-
-        if ( ! $product ) {
-            continue;
-        }
-
-        $product_id = $product->get_id();
-        $parent_id  = $product->get_parent_id();
-
-        /*
-         * Check purchased product first.
-         */
-        $includes_free_website = get_field(
-            'includes_free_website',
-            $product_id
-        );
-
-        /*
-         * If this is a variation, fall back to the parent product.
-         */
-        if ( ! $includes_free_website && $parent_id ) {
-            $includes_free_website = get_field(
-                'includes_free_website',
-                $parent_id
-            );
-        }
-
-        if ( $includes_free_website ) {
-            $qualifies = true;
-            break;
-        }
-    }
-
-    if ( ! $qualifies ) {
-        return;
-    }
-
-    /*
-     * Customer email address.
-     */
     $to = $order->get_billing_email();
 
     if ( ! is_email( $to ) ) {
         return;
     }
 
-    $first_name = $order->get_billing_first_name();
+    /* One email template may appear on more than one line item; send it once. */
+    $emails_to_send = array();
 
-    $subject = 'Your Free WPHQ Website – Let’s Get Started';
+    foreach ( $order->get_items() as $item ) {
+        $email_id = absint( $item->get_meta( '_wphq_purchase_email_id', true ) );
 
-    /*
-     * Build HTML email content.
-     */
-    ob_start();
-    ?>
-
-    <p>
-        <?php
-        if ( $first_name ) {
-            echo 'Hi ' . esc_html( $first_name ) . ',';
-        } else {
-            echo 'Hello,';
+        if ( ! $email_id || ! wphq_is_valid_custom_purchase_email( $email_id ) ) {
+            continue;
         }
-        ?>
-    </p>
 
-    <p>
-        Thanks for choosing WPHQ! Your new plan includes a
-        <strong>professionally built WordPress starter website at no additional cost.</strong>
-    </p>
+        $benefit_key = sanitize_key( $item->get_meta( '_wphq_benefit_key', true ) );
 
-    <p>
-        Getting started is simple. We've put together a step-by-step guide
-        that walks you through everything from choosing your design through launch.
-    </p>
+        if ( ! isset( $emails_to_send[ $email_id ] ) ) {
+            $emails_to_send[ $email_id ] = $benefit_key;
+        }
+    }
 
-    <p style="margin:24px 0;">
-        <a href="https://wphq.io/website-build-process/"
-           style="
-                display:inline-block;
-                background:#e86f1c;
-                color:#ffffff;
-                text-decoration:none;
-                padding:13px 22px;
-                border-radius:6px;
-                font-weight:bold;
-           ">
-            View Your Website Build Guide
-        </a>
-    </p>
+    if ( empty( $emails_to_send ) ) {
+        return;
+    }
 
-    <h2 style="margin-top:30px;">
-        Ready to Jump Right In?
-    </h2>
-
-    <p>
-        You can also go directly to the WPHQ Website Builder and submit
-        the information we'll use to create your website.
-    </p>
-
-    <p>
-        <strong>Website Builder:</strong><br>
-        <a href="https://build.launch.wphq.io/">
-            https://build.launch.wphq.io/
-        </a>
-    </p>
-
-    <p>
-        <strong>Password:</strong>
-        <span style="
-            display:inline-block;
-            margin-left:4px;
-            padding:3px 8px;
-            background:#f3f3f3;
-            border:1px solid #dddddd;
-            border-radius:4px;
-            font-family:monospace;
-        ">
-            build
-        </span>
-    </p>
-
-    <p>
-        The builder will ask for details such as your business name,
-        services or products, logo, branding, images, contact information,
-        and preferred starter design.
-    </p>
-
-    <p>
-        <strong>Don't have everything ready?</strong>
-        That's okay. Provide what you have and we'll help you through anything
-        you're unsure about.
-    </p>
-
-    <h2 style="margin-top:30px;">
-        What Happens After You Submit?
-    </h2>
-
-    <p>
-        WPHQ will prepare your website and contact you when your first version
-        is ready to review.
-    </p>
-
-    <p>
-        Your starter website includes up to
-        <strong>one hour of complimentary edits</strong>
-        so we can make reasonable adjustments before launch.
-    </p>
-
-    <p>
-        We'll also help you get your domain connected when the website is ready
-        to go live.
-    </p>
-
-    <hr style="margin:30px 0;border:0;border-top:1px solid #dddddd;">
-
-    <h2>Need Help?</h2>
-
-    <p>
-        You don't need to be technical to use this service.
-        If you have questions at any point, simply reply to this email
-        and we'll help you through the next step.
-    </p>
-
-    <p>
-        You can also call WPHQ at
-        <a href="tel:+16149166243">614-916-6243</a>.
-    </p>
-
-    <p>
-        We're looking forward to building your new website!
-    </p>
-
-    <p>
-        — The WPHQ Team
-    </p>
-
-    <?php
-
-    $message = ob_get_clean();
-
-    /*
-     * Run the content through the normal WooCommerce email wrapper
-     * so it uses WooCommerce's email branding.
-     */
     $mailer = WC()->mailer();
 
-    $message = $mailer->wrap_message(
-        'Your Free Website Is Included',
-        $message
-    );
+    foreach ( $emails_to_send as $email_id => $benefit_key ) {
+        $sent_meta_key = '_wphq_custom_purchase_email_' . absint( $email_id ) . '_sent';
 
-    $headers = array(
-        'Content-Type: text/html; charset=UTF-8'
-    );
+        if ( $order->get_meta( $sent_meta_key ) ) {
+            continue;
+        }
 
-    /*
-     * Send using the WooCommerce mailer.
-     */
-    $sent = $mailer->send(
-        $to,
-        $subject,
-        $message,
-        $headers
-    );
+        $email_post = get_post( $email_id );
 
-    /*
-     * Mark the order only after successful send.
-     *
-     * This prevents payment_complete + processing from generating
-     * two emails for the same initial order.
-     */
-    if ( $sent ) {
+        if ( ! $email_post || $email_post->post_type !== 'wphq_product_email' ) {
+            continue;
+        }
 
-        $order->update_meta_data(
-            '_wphq_free_website_email_sent',
-            current_time( 'mysql' )
+        $subject = get_post_meta( $email_id, '_wphq_email_subject', true );
+        $heading = get_post_meta( $email_id, '_wphq_email_heading', true );
+        $cta_text = get_post_meta( $email_id, '_wphq_email_cta_text', true );
+        $cta_url  = get_post_meta( $email_id, '_wphq_email_cta_url', true );
+
+        $subject = $subject ? $subject : $email_post->post_title;
+        $heading = $heading ? $heading : $email_post->post_title;
+
+        $subject  = wphq_replace_purchase_email_placeholders( $subject, $order, $benefit_key );
+        $heading  = wphq_replace_purchase_email_placeholders( $heading, $order, $benefit_key );
+        $cta_text = wphq_replace_purchase_email_placeholders( $cta_text, $order, $benefit_key );
+        $cta_url  = wphq_replace_purchase_email_placeholders( $cta_url, $order, $benefit_key );
+        $body     = wphq_replace_purchase_email_placeholders( $email_post->post_content, $order, $benefit_key );
+
+        ob_start();
+        ?>
+
+        <p>
+            <?php
+            $first_name = $order->get_billing_first_name();
+            echo $first_name
+                ? 'Hi ' . esc_html( $first_name ) . ','
+                : 'Hello,';
+            ?>
+        </p>
+
+        <?php echo wp_kses_post( do_shortcode( wpautop( $body ) ) ); ?>
+
+        <?php if ( $cta_text && $cta_url ): ?>
+            <p style="margin:24px 0;">
+                <a href="<?php echo esc_url( $cta_url ); ?>"
+                   style="display:inline-block;background:#e86f1c;color:#ffffff;text-decoration:none;padding:13px 22px;border-radius:6px;font-weight:bold;">
+                    <?php echo esc_html( $cta_text ); ?>
+                </a>
+            </p>
+        <?php endif; ?>
+
+        <hr style="margin:30px 0;border:0;border-top:1px solid #dddddd;">
+
+        <p>
+            Questions? Simply reply to this email or call WPHQ at
+            <a href="tel:+16149166243">614-916-6243</a>.
+        </p>
+
+        <p>— The WPHQ Team</p>
+
+        <?php
+        $message = ob_get_clean();
+
+        $message = $mailer->wrap_message( $heading, $message );
+
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
         );
 
-        $order->save();
-
-        $order->add_order_note(
-            'WPHQ free website onboarding email sent to customer.'
+        $sent = $mailer->send(
+            $to,
+            $subject,
+            $message,
+            $headers
         );
+
+        if ( $sent ) {
+            $order->update_meta_data( $sent_meta_key, current_time( 'mysql' ) );
+            $order->save();
+
+            $note = 'WPHQ custom purchase email sent: ' . get_the_title( $email_id );
+
+            if ( $benefit_key ) {
+                $note .= ' (Benefit: ' . $benefit_key . ')';
+            }
+
+            $order->add_order_note( $note . '.' );
+        }
     }
+}
+
+/**
+ * Backward-compatible function name in case any outside code still calls the
+ * old WPHQ onboarding helper directly. The old product-level ACF flag is no
+ * longer consulted.
+ */
+function wphq_maybe_send_free_website_email( $order_id ) {
+    wphq_maybe_send_custom_purchase_emails( $order_id );
 }
 
 
