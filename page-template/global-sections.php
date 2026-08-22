@@ -292,7 +292,7 @@ if( have_rows('sections') ):
                             </label>
 
                             <span class="pricing-billing-label pricing-billing-label--annual is-active">Annual</span>
-                            <span class="pricing-billing-savings">Save 10% yearly & gain other benefits</span>
+                            <span class="pricing-billing-savings">Save 10% & gain other benefits with annual billing</span>
                         </div>
                     <?php endif; ?>
 
