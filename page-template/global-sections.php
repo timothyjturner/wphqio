@@ -360,22 +360,31 @@ if( have_rows('sections') ):
                             $title              = $display_product->get_name();
                             $plan_icon          = get_field('plan_icon', $display_product_id);
                             $plan_name          = get_field('plan_name', $display_product_id);
-                            $points             = get_field('points', $display_product_id);
 
-                            /* If annual variants do not carry the presentation fields, use monthly. */
-                            if (!$is_one_time && $monthly_product) {
+                            /*
+                             * IMPORTANT:
+                             * Monthly and annual subscription products may have different feature lists.
+                             * For example, annual-only member discounts should NOT appear for monthly buyers.
+                             */
+                            if ($is_one_time) {
+                                $points         = get_field('points', $display_product_id);
+                                $monthly_points = array();
+                                $annual_points  = array();
+                            } else {
                                 $monthly_display_id = $monthly_product->get_id();
+                                $annual_display_id  = $annual_product->get_id();
 
+                                $monthly_points = get_field('points', $monthly_display_id);
+                                $annual_points  = get_field('points', $annual_display_id);
+                                $points         = array();
+
+                                /* Presentation fields can still fall back to the monthly/base product. */
                                 if (empty($plan_icon)) {
                                     $plan_icon = get_field('plan_icon', $monthly_display_id);
                                 }
 
                                 if (empty($plan_name)) {
                                     $plan_name = get_field('plan_name', $monthly_display_id);
-                                }
-
-                                if (empty($points)) {
-                                    $points = get_field('points', $monthly_display_id);
                                 }
 
                                 /* Prefer the monthly/base title when annual product names contain “Annual”. */
@@ -467,14 +476,40 @@ if( have_rows('sections') ):
                                 </div>
 
                                 <div class="content">
-                                    <?php if (!empty($points) && is_array($points)): ?>
-                                        <ul>
-                                            <?php foreach ($points as $point): ?>
-                                                <?php if (!empty($point['point'])): ?>
-                                                    <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
+                                    <?php if ($is_one_time): ?>
+
+                                        <?php if (!empty($points) && is_array($points)): ?>
+                                            <ul class="pricing-points pricing-points--one-time">
+                                                <?php foreach ($points as $point): ?>
+                                                    <?php if (!empty($point['point'])): ?>
+                                                        <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        <?php endif; ?>
+
+                                    <?php else: ?>
+
+                                        <ul class="pricing-points pricing-points--monthly" hidden>
+                                            <?php if (!empty($monthly_points) && is_array($monthly_points)): ?>
+                                                <?php foreach ($monthly_points as $point): ?>
+                                                    <?php if (!empty($point['point'])): ?>
+                                                        <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </ul>
+
+                                        <ul class="pricing-points pricing-points--annual">
+                                            <?php if (!empty($annual_points) && is_array($annual_points)): ?>
+                                                <?php foreach ($annual_points as $point): ?>
+                                                    <?php if (!empty($point['point'])): ?>
+                                                        <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </ul>
+
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -571,6 +606,10 @@ if( have_rows('sections') ):
                 .subscription-details {
                     display: none;
                 }
+
+                .pricing-points[hidden] {
+                    display: none !important;
+                }
                 section.pricing-table .col-md-4 .pricing-header .pricing-wrap {
                     margin-bottom: 32px;
                 }
@@ -609,6 +648,8 @@ if( have_rows('sections') ):
                             var period = card.querySelector('.per-month p');
                             var button = card.querySelector('.wphq-select-plan-button');
                             var benefit = card.querySelector('.pricing-annual-benefit');
+                            var monthlyPoints = card.querySelector('.pricing-points--monthly');
+                            var annualPoints = card.querySelector('.pricing-points--annual');
 
                             var productId = useAnnual ? card.dataset.annualId : card.dataset.monthlyId;
                             var productUrl = useAnnual ? card.dataset.annualUrl : card.dataset.monthlyUrl;
@@ -626,6 +667,8 @@ if( have_rows('sections') ):
                             }
 
                             if (benefit) benefit.hidden = !useAnnual;
+                            if (monthlyPoints) monthlyPoints.hidden = useAnnual;
+                            if (annualPoints) annualPoints.hidden = !useAnnual;
                         });
                     }
 
