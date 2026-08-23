@@ -428,9 +428,7 @@ function wphq_maybe_send_custom_purchase_emails( $order_id ) {
         <?php if ( $cta_text && $cta_url ): ?>
             <p style="margin:24px 0;">
                 <a href="<?php echo esc_url( $cta_url ); ?>"
-                   style="display:inline-block;background:#e86f1c;color:#ffffff;text-decoration:none;padding:13px 22px;border-radius:6px;font-weight:bold;">
-                    <?php echo esc_html( $cta_text ); ?>
-                </a>
+                   style="display:inline-block;background:#e86f1c;color:#ffffff;text-decoration:none;padding:13px 22px;border-radius:6px;font-weight:bold;"><?php echo esc_html( $cta_text ); ?></a>
             </p>
         <?php endif; ?>
 
