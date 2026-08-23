@@ -718,6 +718,60 @@ add_shortcode(
 
 
 /**
+ * Render WPHQ-managed content that may contain shortcodes.
+ *
+ * This is used by ACF/WooCommerce text fields so our rate shortcodes are
+ * consistently expanded before the resulting HTML is sanitized/output.
+ */
+function wphq_render_dynamic_content( $content ) {
+    if ( $content === null || $content === '' ) {
+        return '';
+    }
+
+    $content  = (string) $content;
+    $rendered = do_shortcode( $content );
+
+    /*
+     * Defensive fallback: if the shortcode parser ever leaves one of our
+     * known rate shortcodes untouched, render it directly rather than
+     * exposing shortcode syntax to the customer.
+     */
+    if ( strpos( $rendered, '[wphq_base_rate' ) !== false ) {
+        $rendered = preg_replace_callback(
+            "/\\[wphq_base_rate(?:\\s+text=(?:\"([^\"]*)\"|\'([^\']*)\'))?\\s*\\]/i",
+            static function ( $matches ) {
+                $text = '';
+                if ( isset( $matches[1] ) && $matches[1] !== '' ) {
+                    $text = $matches[1];
+                } elseif ( isset( $matches[2] ) && $matches[2] !== '' ) {
+                    $text = $matches[2];
+                }
+
+                return wphq_base_rate_shortcode(
+                    $text !== '' ? array( 'text' => $text ) : array()
+                );
+            },
+            $rendered
+        );
+    }
+
+    if ( strpos( $rendered, '[wphq_discounted_rate' ) !== false ) {
+        $rendered = preg_replace_callback(
+            '/\\[wphq_discounted_rate(?:\\s+discount=(?:"?)([0-9.]+)(?:"?))?\\s*\\]/i',
+            static function ( $matches ) {
+                return wphq_discounted_rate_shortcode(
+                    array( 'discount' => isset( $matches[1] ) ? $matches[1] : 0 )
+                );
+            },
+            $rendered
+        );
+    }
+
+    return $rendered;
+}
+
+
+/**
  * =========================================================
  * OUTPUT RATE MODAL ON FRONT END
  * =========================================================

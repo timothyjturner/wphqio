@@ -33,17 +33,11 @@ get_header(); ?>
 
                         
         <?php
-        if( is_page( 'seo-performance-subscriptions' ) ) {?>
+        if( is_page( 'seo-performance-subscriptions' ) || is_page( 'wordpress-hosting-maintenance' ) || is_page( 'shopify' ) || is_page( 'wordpress-website-recovery' ) || is_page( 'wordpress-speed-optimization' ) || is_page( 'wordpress-site-migration' ) || is_page( 'wordpress-technical-seo' ) || is_page( 'wordpress-troubleshooting' ) || is_page( 'wordpress-updates-compatibility' ) ) {?>
                         
      <div class="btn-dropdown-wrapper">
      <a class="primary-btn2 <?php $title ?>" href="#simple-content"><?=$buttons['button']['title']?></a>
-     </div>
-                        
-  <?php
-  }elseif ( is_page( 'wordpress-hosting-maintenance' )) { ?>                
-            <div class="btn-dropdown-wrapper">
-     <a class="primary-btn2 <?php $title ?>" href="#simple-content"><?=$buttons['button']['title']?></a>
-     </div>         
+     </div>      
                         
   <?php
    }else {
@@ -107,7 +101,7 @@ if( have_rows('sections') ):
                     <?php if($tiles): ?>
                         <div class="row">
                             <?php foreach($tiles as $tile): ?>
-                                <div class="col-md-4 card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="800">
+                                <div class="col-md-3 card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="800">
                                     <div class="inner">
                                         <img src="<?=$tile['icon']['url']?>">
 
@@ -163,6 +157,8 @@ if( have_rows('sections') ):
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
+                            <h4 style="padding-top: 15px;padding-left: 5px;color:white;">Have a quick question? Call <a href="tel:614-916-6243" style="text-decoration: underline;color: white;">614-916-6243</a>. We are happy to help!</h4>
+
                         </div>
 
                         <div class="col-md-4">
@@ -244,6 +240,7 @@ if( have_rows('sections') ):
                                     </div>
                                 </div>
                             </div>
+                            <h4 style="padding-top: 15px;padding-left: 5px;color:white;">Have a quick question? Call <a href="tel:614-916-6243" style="text-decoration: underline;color: white;">614-916-6243</a>. We are happy to help!</h4>
                         </div>
                     </div>
                 </div>
@@ -295,7 +292,7 @@ if( have_rows('sections') ):
                             </label>
 
                             <span class="pricing-billing-label pricing-billing-label--annual is-active">Annual</span>
-                            <span class="pricing-billing-savings">Save 10% yearly</span>
+                            <span class="pricing-billing-savings">Save 10% & gain other benefits with annual billing</span>
                         </div>
                     <?php endif; ?>
 
@@ -306,11 +303,23 @@ if( have_rows('sections') ):
                                 : 'subscription';
 
                             /*
-                             * Optional ACF True/False field on each Plans repeater row.
-                             * Field name: include_free_website
-                             * Default should be off so non-hosting plans do not receive the offer.
+                             * Page-level annual acquisition benefit.
+                             * These values belong to this pricing-row context, NOT the WC product.
                              */
-                            $include_free_website = !empty($plan['include_free_website']);
+                            $annual_benefit_message = isset($plan['annual_benefit_message'])
+                                ? (string) $plan['annual_benefit_message']
+                                : '';
+                            $custom_purchase_email_id = $get_product_id($plan['custom_purchase_email'] ?? 0);
+                            $benefit_key = !empty($plan['benefit_key'])
+                                ? sanitize_key((string) $plan['benefit_key'])
+                                : '';
+
+                            if (!$benefit_key && $custom_purchase_email_id) {
+                                $email_post = get_post($custom_purchase_email_id);
+                                if ($email_post && $email_post->post_type === 'wphq_product_email') {
+                                    $benefit_key = sanitize_key($email_post->post_name);
+                                }
+                            }
 
                             $is_one_time = in_array(
                                 $plan_type,
@@ -363,22 +372,31 @@ if( have_rows('sections') ):
                             $title              = $display_product->get_name();
                             $plan_icon          = get_field('plan_icon', $display_product_id);
                             $plan_name          = get_field('plan_name', $display_product_id);
-                            $points             = get_field('points', $display_product_id);
 
-                            /* If annual variants do not carry the presentation fields, use monthly. */
-                            if (!$is_one_time && $monthly_product) {
+                            /*
+                             * IMPORTANT:
+                             * Monthly and annual subscription products may have different feature lists.
+                             * For example, annual-only member discounts should NOT appear for monthly buyers.
+                             */
+                            if ($is_one_time) {
+                                $points         = get_field('points', $display_product_id);
+                                $monthly_points = array();
+                                $annual_points  = array();
+                            } else {
                                 $monthly_display_id = $monthly_product->get_id();
+                                $annual_display_id  = $annual_product->get_id();
 
+                                $monthly_points = get_field('points', $monthly_display_id);
+                                $annual_points  = get_field('points', $annual_display_id);
+                                $points         = array();
+
+                                /* Presentation fields can still fall back to the monthly/base product. */
                                 if (empty($plan_icon)) {
                                     $plan_icon = get_field('plan_icon', $monthly_display_id);
                                 }
 
                                 if (empty($plan_name)) {
                                     $plan_name = get_field('plan_name', $monthly_display_id);
-                                }
-
-                                if (empty($points)) {
-                                    $points = get_field('points', $monthly_display_id);
                                 }
 
                                 /* Prefer the monthly/base title when annual product names contain “Annual”. */
@@ -412,6 +430,33 @@ if( have_rows('sections') ):
                                 $annual_price_html  = $annual_product->get_price_html();
                                 $monthly_url        = $monthly_product->add_to_cart_url();
                                 $annual_url         = $annual_product->add_to_cart_url();
+
+                                /*
+                                 * Only the annual purchase receives the landing-page benefit.
+                                 * The signed context travels with this specific add-to-cart request.
+                                 */
+                                if (
+                                    $custom_purchase_email_id &&
+                                    $benefit_key &&
+                                    function_exists('wphq_is_valid_custom_purchase_email') &&
+                                    wphq_is_valid_custom_purchase_email($custom_purchase_email_id) &&
+                                    function_exists('wphq_build_benefit_signature')
+                                ) {
+                                    $benefit_signature = wphq_build_benefit_signature(
+                                        $annual_product->get_id(),
+                                        $custom_purchase_email_id,
+                                        $benefit_key
+                                    );
+
+                                    $annual_url = add_query_arg(
+                                        array(
+                                            'wphq_purchase_email' => $custom_purchase_email_id,
+                                            'wphq_benefit_key'    => $benefit_key,
+                                            'wphq_benefit_sig'    => $benefit_signature,
+                                        ),
+                                        $annual_url
+                                    );
+                                }
                             }
                         ?>
 
@@ -450,13 +495,9 @@ if( have_rows('sections') ):
                                         </div>
                                     </div>
 
-                                    <?php if (!$is_one_time && $include_free_website): ?>
+                                    <?php if (!$is_one_time && trim($annual_benefit_message) !== ''): ?>
                                         <div class="pricing-annual-benefit">
-                                            <strong>Free new website included</strong>
-                                            <span>
-                                                Annual billing includes one website built by WPHQ using one of our customizable starter themes.
-                                                <a href="/free-website-details/">Details</a>
-                                            </span>
+                                            <?php echo wp_kses_post( do_shortcode( $annual_benefit_message ) ); ?>
                                         </div>
                                     <?php endif; ?>
 
@@ -470,14 +511,40 @@ if( have_rows('sections') ):
                                 </div>
 
                                 <div class="content">
-                                    <?php if (!empty($points) && is_array($points)): ?>
-                                        <ul>
-                                            <?php foreach ($points as $point): ?>
-                                                <?php if (!empty($point['point'])): ?>
-                                                    <li><?php echo wp_kses_post($point['point']); ?></li>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
+                                    <?php if ($is_one_time): ?>
+
+                                        <?php if (!empty($points) && is_array($points)): ?>
+                                            <ul class="pricing-points pricing-points--one-time">
+                                                <?php foreach ($points as $point): ?>
+                                                    <?php if (!empty($point['point'])): ?>
+                                                        <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        <?php endif; ?>
+
+                                    <?php else: ?>
+
+                                        <ul class="pricing-points pricing-points--monthly" hidden>
+                                            <?php if (!empty($monthly_points) && is_array($monthly_points)): ?>
+                                                <?php foreach ($monthly_points as $point): ?>
+                                                    <?php if (!empty($point['point'])): ?>
+                                                        <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </ul>
+
+                                        <ul class="pricing-points pricing-points--annual">
+                                            <?php if (!empty($annual_points) && is_array($annual_points)): ?>
+                                                <?php foreach ($annual_points as $point): ?>
+                                                    <?php if (!empty($point['point'])): ?>
+                                                        <li><?php echo wp_kses_post( do_shortcode( $point['point'] ) ); ?></li>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </ul>
+
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -574,8 +641,12 @@ if( have_rows('sections') ):
                 .subscription-details {
                     display: none;
                 }
+
+                .pricing-points[hidden] {
+                    display: none !important;
+                }
                 section.pricing-table .col-md-4 .pricing-header .pricing-wrap {
-                    margin-bottom: 16px;
+                    margin-bottom: 32px;
                 }
             </style>
 
@@ -612,6 +683,8 @@ if( have_rows('sections') ):
                             var period = card.querySelector('.per-month p');
                             var button = card.querySelector('.wphq-select-plan-button');
                             var benefit = card.querySelector('.pricing-annual-benefit');
+                            var monthlyPoints = card.querySelector('.pricing-points--monthly');
+                            var annualPoints = card.querySelector('.pricing-points--annual');
 
                             var productId = useAnnual ? card.dataset.annualId : card.dataset.monthlyId;
                             var productUrl = useAnnual ? card.dataset.annualUrl : card.dataset.monthlyUrl;
@@ -629,6 +702,8 @@ if( have_rows('sections') ):
                             }
 
                             if (benefit) benefit.hidden = !useAnnual;
+                            if (monthlyPoints) monthlyPoints.hidden = useAnnual;
+                            if (annualPoints) annualPoints.hidden = !useAnnual;
                         });
                     }
 
