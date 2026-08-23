@@ -302,6 +302,22 @@ if( have_rows('sections') ):
                                 ? sanitize_key((string) $plan['plan_type'])
                                 : 'subscription';
 
+                            $get_product_id = static function ($value) {
+                                if ($value instanceof WP_Post) {
+                                    return (int) $value->ID;
+                                }
+
+                                if (is_object($value) && isset($value->ID)) {
+                                    return (int) $value->ID;
+                                }
+
+                                if (is_array($value) && isset($value['ID'])) {
+                                    return (int) $value['ID'];
+                                }
+
+                                return absint($value);
+                            };
+
                             /*
                              * Page-level annual acquisition benefit.
                              * These values belong to this pricing-row context, NOT the WC product.
@@ -326,22 +342,6 @@ if( have_rows('sections') ):
                                 array('one_time', 'one-time', 'onetime', 'one_time_product', 'standalone'),
                                 true
                             );
-
-                            $get_product_id = static function ($value) {
-                                if ($value instanceof WP_Post) {
-                                    return (int) $value->ID;
-                                }
-
-                                if (is_object($value) && isset($value->ID)) {
-                                    return (int) $value->ID;
-                                }
-
-                                if (is_array($value) && isset($value['ID'])) {
-                                    return (int) $value['ID'];
-                                }
-
-                                return absint($value);
-                            };
 
                             $monthly_id  = $get_product_id($plan['monthly_product'] ?? 0);
                             $annual_id   = $get_product_id($plan['annual_product'] ?? 0);
