@@ -1531,9 +1531,65 @@ if( have_rows('sections') ):
                 }
 
                 @media (max-width: 650px) {
+
+                    .fp-alternate {
+                        text-align: center;
+                    }
+
                     .fp-alternate__top {
-                        grid-template-columns: 1fr;
-                        gap: 14px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 16px;
+                        padding: 28px 22px 22px;
+                    }
+
+                    .fp-alternate__intro {
+                        width: 100%;
+                        max-width: 480px;
+                        text-align: center;
+                    }
+
+                    .fp-alternate__intro strong {
+                        margin-bottom: 8px;
+                        font-size: 20px;
+                        line-height: 1.25;
+                    }
+
+                    .fp-alternate__intro span {
+                        display: block;
+                        font-size: 15px;
+                        line-height: 1.55;
+                    }
+
+                    .fp-alternate__plan {
+                        width: 100%;
+                        justify-content: center;
+                        text-align: left;
+                    }
+
+                    .fp-alternate__price {
+                        width: 100%;
+                        text-align: center;
+                    }
+
+                    .fp-alternate__price .fp-card__price,
+                    .fp-alternate__price .fp-card__period {
+                        text-align: center;
+                    }
+
+                    .fp-alternate__button {
+                        display: block;
+                        width: 100%;
+                        max-width: 280px;
+                        margin: 2px auto 0;
+                        padding: 13px 18px;
+                        text-align: center;
+                    }
+
+                    .fp-alternate__benefits {
+                        padding: 0 22px 22px;
+                        text-align: left;
                     }
 
                     .fp-alternate__benefits .fp-benefits__highlighted,
