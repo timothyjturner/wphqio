@@ -410,11 +410,38 @@ if( have_rows('sections') ):
                                 $icon_url = wp_get_attachment_image_url((int) $plan_icon, 'full');
                             }
 
+                            /*
+                             * Analytics tracking for plan selection.
+                             *
+                             * Incoming navigation URLs may contain wphq_event / wphq_source
+                             * (for example, view_plans from the landscaping page or site menu).
+                             * WooCommerce add_to_cart_url() can inherit those query parameters
+                             * from the current request, so strip ONLY our disposable analytics
+                             * parameters before building the Select Plan URLs.
+                             *
+                             * Then add a fresh select_plan event that identifies the plan and
+                             * billing period. Purchase-benefit parameters are preserved.
+                             */
+                            $plan_tracking_key = sanitize_title((string) ($plan_name ?: $title));
+                            $plan_tracking_key = str_replace('-', '_', $plan_tracking_key);
+
                             if ($is_one_time) {
                                 $initial_product_id = $one_time_product->get_id();
                                 $initial_price_html = $one_time_product->get_price_html();
                                 $initial_period     = 'one time';
-                                $initial_url        = $one_time_product->add_to_cart_url();
+
+                                $initial_url = remove_query_arg(
+                                    array('wphq_event', 'wphq_source'),
+                                    $one_time_product->add_to_cart_url()
+                                );
+
+                                $initial_url = add_query_arg(
+                                    array(
+                                        'wphq_event'  => 'select_plan',
+                                        'wphq_source' => 'pricing_table_' . $plan_tracking_key . '_one_time',
+                                    ),
+                                    $initial_url
+                                );
 
                                 $monthly_price_html = '';
                                 $annual_price_html  = '';
@@ -424,12 +451,19 @@ if( have_rows('sections') ):
                                 $initial_product_id = $annual_product->get_id();
                                 $initial_price_html = $annual_product->get_price_html();
                                 $initial_period     = 'per year';
-                                $initial_url        = $annual_product->add_to_cart_url();
 
                                 $monthly_price_html = $monthly_product->get_price_html();
                                 $annual_price_html  = $annual_product->get_price_html();
-                                $monthly_url        = $monthly_product->add_to_cart_url();
-                                $annual_url         = $annual_product->add_to_cart_url();
+
+                                $monthly_url = remove_query_arg(
+                                    array('wphq_event', 'wphq_source'),
+                                    $monthly_product->add_to_cart_url()
+                                );
+
+                                $annual_url = remove_query_arg(
+                                    array('wphq_event', 'wphq_source'),
+                                    $annual_product->add_to_cart_url()
+                                );
 
                                 /*
                                  * Only the annual purchase receives the landing-page benefit.
@@ -457,6 +491,29 @@ if( have_rows('sections') ):
                                         $annual_url
                                     );
                                 }
+
+                                /*
+                                 * Add the plan-selection tracking only after the purchase-benefit
+                                 * URL is complete so the signed benefit parameters remain intact.
+                                 */
+                                $monthly_url = add_query_arg(
+                                    array(
+                                        'wphq_event'  => 'select_plan',
+                                        'wphq_source' => 'pricing_table_' . $plan_tracking_key . '_monthly',
+                                    ),
+                                    $monthly_url
+                                );
+
+                                $annual_url = add_query_arg(
+                                    array(
+                                        'wphq_event'  => 'select_plan',
+                                        'wphq_source' => 'pricing_table_' . $plan_tracking_key . '_annual',
+                                    ),
+                                    $annual_url
+                                );
+
+                                // Annual is the default selection shown when the pricing table loads.
+                                $initial_url = $annual_url;
                             }
                         ?>
 
