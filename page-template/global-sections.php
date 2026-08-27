@@ -246,6 +246,1411 @@ if( have_rows('sections') ):
                 </div>
             </section>
 
+
+        <?php elseif( get_row_layout() == 'featured_pricing' ):
+
+            /*
+             * Featured Pricing
+             * ----------------
+             * Purpose-built pricing presentation for the main Hosting & Maintenance page.
+             * The existing generic pricing_table layout remains untouched and fully reusable.
+             *
+             * ACF fields:
+             * - primary_plan
+             * - featured_plan
+             * - alternate_plan
+             * - premium_plan_1
+             * - premium_plan_2
+             * - show_website_included_banner
+             * - featured_badge_text
+             * - section_eyebrow
+             * - section_title
+             * - section_intro
+             * - alternate_plan_intro
+             * - premium_section_title
+             * - premium_section_intro
+             *
+             * Product ACF:
+             * - plan_icon
+             * - plan_name
+             * - points (repeater)
+             *   - point
+             *   - featured_highlight (true/false)
+             *
+             * Optional deterministic pairing fields on the WooCommerce product:
+             * - monthly_product
+             * - annual_product
+             *
+             * If those fields do not exist or are empty, the component falls back
+             * to matching by plan_name / normalized product title.
+             */
+
+            $fp_primary_ref   = get_sub_field('primary_plan');
+            $fp_featured_ref  = get_sub_field('featured_plan');
+            $fp_alternate_ref = get_sub_field('alternate_plan');
+            $fp_premium_1_ref = get_sub_field('premium_plan_1');
+            $fp_premium_2_ref = get_sub_field('premium_plan_2');
+
+            $fp_show_website_banner = (bool) get_sub_field('show_website_included_banner');
+            $fp_badge_text         = trim((string) get_sub_field('featured_badge_text'));
+            $fp_eyebrow            = trim((string) get_sub_field('section_eyebrow'));
+            $fp_title              = trim((string) get_sub_field('section_title'));
+            $fp_intro              = trim((string) get_sub_field('section_intro'));
+            $fp_alternate_intro    = trim((string) get_sub_field('alternate_plan_intro'));
+            $fp_premium_title      = trim((string) get_sub_field('premium_section_title'));
+            $fp_premium_intro      = trim((string) get_sub_field('premium_section_intro'));
+
+            $fp_badge_text      = $fp_badge_text ?: 'Most Popular';
+            $fp_eyebrow         = $fp_eyebrow ?: 'Simple Plans. Clear Value.';
+            $fp_title           = $fp_title ?: 'Choose How Much We Handle';
+            $fp_intro           = $fp_intro ?: 'Choose the level of hosting, maintenance, and hands-on website support that fits your business.';
+            $fp_alternate_intro = $fp_alternate_intro ?: 'Already have hosting you want to keep?';
+            $fp_premium_title   = $fp_premium_title ?: 'Need More Hands-On Help?';
+            $fp_premium_intro   = $fp_premium_intro ?: 'For businesses that need more development time and higher-touch support.';
+
+            $fp_get_product_id = static function ($value) {
+                if ($value instanceof WP_Post) {
+                    return (int) $value->ID;
+                }
+                if (is_object($value) && isset($value->ID)) {
+                    return (int) $value->ID;
+                }
+                if (is_array($value) && isset($value['ID'])) {
+                    return (int) $value['ID'];
+                }
+                return absint($value);
+            };
+
+            $fp_get_product = static function ($value) use ($fp_get_product_id) {
+                $id = $fp_get_product_id($value);
+                return $id ? wc_get_product($id) : false;
+            };
+
+            /*
+             * Normalize product titles so monthly/annual sibling products can be paired.
+             * Example:
+             * "Hosting Only Annual" and "Hosting Only" => "hosting only"
+             */
+            $fp_normalize_title = static function ($title) {
+                $title = wp_strip_all_tags((string) $title);
+                $title = preg_replace('/\b(monthly|annual|yearly|year|month)\b/i', ' ', $title);
+                $title = preg_replace('/\s+/', ' ', $title);
+                return trim(strtolower($title));
+            };
+
+            /*
+             * Determine the billing period of a WooCommerce subscription product.
+             * Falls back to the product title if WooCommerce Subscriptions helpers
+             * are unavailable.
+             */
+            $fp_get_period = static function ($product) {
+                if (!$product) {
+                    return '';
+                }
+
+                if (class_exists('WC_Subscriptions_Product')) {
+                    $period = WC_Subscriptions_Product::get_period($product);
+                    if ($period === 'year') {
+                        return 'annual';
+                    }
+                    if ($period === 'month') {
+                        return 'monthly';
+                    }
+                }
+
+                $title = $product->get_name();
+                if (stripos($title, 'annual') !== false || stripos($title, 'yearly') !== false) {
+                    return 'annual';
+                }
+                if (stripos($title, 'monthly') !== false) {
+                    return 'monthly';
+                }
+
+                return '';
+            };
+
+            /*
+             * Build a small product cache once. Pairing is deterministic when
+             * product-level ACF fields monthly_product / annual_product are present.
+             * Otherwise fall back to plan_name / normalized title matching.
+             */
+            $fp_all_products = wc_get_products(array(
+                'status' => 'publish',
+                'limit'  => -1,
+                'return' => 'objects',
+            ));
+
+            $fp_pair_product = static function ($selected) use (
+                $fp_all_products,
+                $fp_get_period,
+                $fp_normalize_title,
+                $fp_get_product
+            ) {
+                if (!$selected) {
+                    return array('monthly' => false, 'annual' => false, 'display' => false);
+                }
+
+                $selected_id = $selected->get_id();
+
+                /*
+                 * Preferred / deterministic path:
+                 * Add product-level ACF Post Object fields named monthly_product
+                 * and annual_product. When populated, those exact products win.
+                 */
+                $explicit_monthly = $fp_get_product(get_field('monthly_product', $selected_id));
+                $explicit_annual  = $fp_get_product(get_field('annual_product', $selected_id));
+
+                if ($explicit_monthly || $explicit_annual) {
+                    $monthly = $explicit_monthly ?: $selected;
+                    $annual  = $explicit_annual ?: $selected;
+
+                    return array(
+                        'monthly' => $monthly,
+                        'annual'  => $annual,
+                        'display' => $monthly ?: $annual ?: $selected,
+                    );
+                }
+
+                $selected_period     = $fp_get_period($selected);
+                $selected_plan_name  = trim((string) get_field('plan_name', $selected_id));
+                $selected_base_title = $fp_normalize_title($selected->get_name());
+
+                $monthly = ($selected_period === 'monthly') ? $selected : false;
+                $annual  = ($selected_period === 'annual') ? $selected : false;
+
+                foreach ($fp_all_products as $candidate) {
+                    if (!$candidate || $candidate->get_id() === $selected_id) {
+                        continue;
+                    }
+
+                    $candidate_period = $fp_get_period($candidate);
+                    if (!$candidate_period || ($candidate_period !== 'monthly' && $candidate_period !== 'annual')) {
+                        continue;
+                    }
+
+                    $candidate_plan_name  = trim((string) get_field('plan_name', $candidate->get_id()));
+                    $candidate_base_title = $fp_normalize_title($candidate->get_name());
+
+                    $plan_name_matches = (
+                        $selected_plan_name !== '' &&
+                        $candidate_plan_name !== '' &&
+                        strcasecmp($selected_plan_name, $candidate_plan_name) === 0
+                    );
+
+                    $title_matches = (
+                        $selected_base_title !== '' &&
+                        $candidate_base_title === $selected_base_title
+                    );
+
+                    if (!$plan_name_matches && !$title_matches) {
+                        continue;
+                    }
+
+                    if ($candidate_period === 'monthly' && !$monthly) {
+                        $monthly = $candidate;
+                    }
+
+                    if ($candidate_period === 'annual' && !$annual) {
+                        $annual = $candidate;
+                    }
+                }
+
+                /*
+                 * Safe fallback so a missing sibling never breaks the card.
+                 */
+                if (!$monthly && !$annual) {
+                    $monthly = $selected;
+                    $annual  = $selected;
+                } elseif (!$monthly) {
+                    $monthly = $annual;
+                } elseif (!$annual) {
+                    $annual = $monthly;
+                }
+
+                return array(
+                    'monthly' => $monthly,
+                    'annual'  => $annual,
+                    'display' => $monthly ?: $annual ?: $selected,
+                );
+            };
+
+            $fp_clean_tracking = static function ($url) {
+                return remove_query_arg(array('wphq_event', 'wphq_source'), (string) $url);
+            };
+
+            $fp_tracking_url = static function ($url, $source) use ($fp_clean_tracking) {
+                $url = $fp_clean_tracking($url);
+                return add_query_arg(
+                    array(
+                        'wphq_event'  => 'select_plan',
+                        'wphq_source' => sanitize_key($source),
+                    ),
+                    $url
+                );
+            };
+
+
+            /*
+             * Preserve annual acquisition-benefit context on Featured Pricing URLs
+             * when the selected annual WooCommerce product stores these product-level
+             * ACF fields:
+             *
+             * - custom_purchase_email
+             * - benefit_key
+             *
+             * If those fields are absent, this safely does nothing.
+             */
+            $fp_apply_purchase_benefit = static function ($url, $annual_product) use ($fp_get_product_id) {
+                if (!$annual_product) {
+                    return $url;
+                }
+
+                $product_id = $annual_product->get_id();
+
+                $custom_purchase_email_id = $fp_get_product_id(
+                    get_field('custom_purchase_email', $product_id)
+                );
+
+                $benefit_key = sanitize_key(
+                    (string) get_field('benefit_key', $product_id)
+                );
+
+                if (!$benefit_key && $custom_purchase_email_id) {
+                    $email_post = get_post($custom_purchase_email_id);
+
+                    if ($email_post && $email_post->post_type === 'wphq_product_email') {
+                        $benefit_key = sanitize_key($email_post->post_name);
+                    }
+                }
+
+                if (
+                    !$custom_purchase_email_id ||
+                    !$benefit_key ||
+                    !function_exists('wphq_is_valid_custom_purchase_email') ||
+                    !wphq_is_valid_custom_purchase_email($custom_purchase_email_id) ||
+                    !function_exists('wphq_build_benefit_signature')
+                ) {
+                    return $url;
+                }
+
+                $signature = wphq_build_benefit_signature(
+                    $product_id,
+                    $custom_purchase_email_id,
+                    $benefit_key
+                );
+
+                return add_query_arg(
+                    array(
+                        'wphq_purchase_email' => $custom_purchase_email_id,
+                        'wphq_benefit_key'    => $benefit_key,
+                        'wphq_benefit_sig'    => $signature,
+                    ),
+                    $url
+                );
+            };
+
+            $fp_prepare_slot = static function ($ref, $slot_key) use (
+                $fp_get_product,
+                $fp_pair_product,
+                $fp_tracking_url,
+                $fp_apply_purchase_benefit,
+                $fp_get_period,
+                $fp_normalize_title
+            ) {
+                $selected = $fp_get_product($ref);
+                if (!$selected) {
+                    return false;
+                }
+
+                $pair    = $fp_pair_product($selected);
+                $monthly = $pair['monthly'];
+                $annual  = $pair['annual'];
+                $display = $pair['display'];
+
+                if (!$display) {
+                    return false;
+                }
+
+                $display_id = $display->get_id();
+                $plan_name  = trim((string) get_field('plan_name', $display_id));
+                $plan_icon  = get_field('plan_icon', $display_id);
+
+                if (!$plan_name && $monthly) {
+                    $plan_name = trim((string) get_field('plan_name', $monthly->get_id()));
+                }
+
+                if (empty($plan_icon) && $monthly) {
+                    $plan_icon = get_field('plan_icon', $monthly->get_id());
+                }
+
+                $icon_url = '';
+                if (is_array($plan_icon) && !empty($plan_icon['url'])) {
+                    $icon_url = $plan_icon['url'];
+                } elseif (is_numeric($plan_icon)) {
+                    $icon_url = wp_get_attachment_image_url((int) $plan_icon, 'full');
+                }
+
+                /*
+                 * Use the monthly/base title for presentation so names such as
+                 * "Hosting Only Annual" do not appear in the card heading.
+                 */
+                $title_source = $monthly ?: $display;
+                $product_title = $title_source->get_name();
+                $product_title = preg_replace('/\b(monthly|annual|yearly)\b/i', '', $product_title);
+                $product_title = trim(preg_replace('/\s+/', ' ', $product_title));
+
+                $monthly_id    = $monthly ? $monthly->get_id() : $display_id;
+                $annual_id     = $annual ? $annual->get_id() : $display_id;
+
+                $monthly_points = get_field('points', $monthly_id);
+                $annual_points  = get_field('points', $annual_id);
+
+                $monthly_points = is_array($monthly_points) ? $monthly_points : array();
+                $annual_points  = is_array($annual_points) ? $annual_points : array();
+
+                $split_points = static function ($points) {
+                    $highlighted = array();
+                    $other = array();
+
+                    foreach ($points as $row) {
+                        $text = isset($row['point']) ? trim((string) $row['point']) : '';
+                        if ($text === '') {
+                            continue;
+                        }
+
+                        if (!empty($row['featured_highlight'])) {
+                            $highlighted[] = $text;
+                        } else {
+                            $other[] = $text;
+                        }
+                    }
+
+                    /*
+                     * Safe fallback for existing products whose benefits have not
+                     * been tagged yet: show the first four instead of an empty card.
+                     */
+                    if (!$highlighted && $other) {
+                        $highlighted = array_slice($other, 0, 4);
+                        $other = array_slice($other, 4);
+                    }
+
+                    return array(
+                        'highlighted' => $highlighted,
+                        'other'       => $other,
+                    );
+                };
+
+                $monthly_split = $split_points($monthly_points);
+                $annual_split  = $split_points($annual_points);
+
+                $monthly_url = $monthly ? $fp_tracking_url(
+                    $monthly->add_to_cart_url(),
+                    'featured_pricing_' . sanitize_key($slot_key) . '_monthly'
+                ) : '';
+
+                $annual_base_url = $annual ? $annual->add_to_cart_url() : '';
+
+                if ($annual && $annual_base_url) {
+                    $annual_base_url = $fp_apply_purchase_benefit(
+                        $annual_base_url,
+                        $annual
+                    );
+                }
+
+                $annual_url = $annual ? $fp_tracking_url(
+                    $annual_base_url,
+                    'featured_pricing_' . sanitize_key($slot_key) . '_annual'
+                ) : '';
+
+                $monthly_price = $monthly ? $monthly->get_price_html() : '';
+                $annual_price  = $annual ? $annual->get_price_html() : '';
+
+                $save_amount = 0;
+                if ($monthly && $annual) {
+                    $m = (float) $monthly->get_price();
+                    $a = (float) $annual->get_price();
+                    if ($m > 0 && $a > 0) {
+                        $save_amount = max(0, ($m * 12) - $a);
+                    }
+                }
+
+                return array(
+                    'slot'                 => sanitize_key($slot_key),
+                    'plan_name'            => $plan_name,
+                    'title'                => $product_title,
+                    'icon_url'             => $icon_url,
+                    'monthly_id'           => $monthly_id,
+                    'annual_id'            => $annual_id,
+                    'monthly_price'        => $monthly_price,
+                    'annual_price'         => $annual_price,
+                    'monthly_url'          => $monthly_url,
+                    'annual_url'           => $annual_url,
+                    'monthly_highlighted'  => $monthly_split['highlighted'],
+                    'monthly_other'        => $monthly_split['other'],
+                    'annual_highlighted'   => $annual_split['highlighted'],
+                    'annual_other'         => $annual_split['other'],
+                    'save_amount'          => $save_amount,
+                    'short_description'    => wp_strip_all_tags($display->get_short_description()),
+                );
+            };
+
+            $fp_primary   = $fp_prepare_slot($fp_primary_ref, 'primary');
+            $fp_featured  = $fp_prepare_slot($fp_featured_ref, 'featured');
+            $fp_alternate = $fp_prepare_slot($fp_alternate_ref, 'alternate');
+            $fp_premium_1 = $fp_prepare_slot($fp_premium_1_ref, 'premium_1');
+            $fp_premium_2 = $fp_prepare_slot($fp_premium_2_ref, 'premium_2');
+
+            $fp_render_points = static function ($slot, $billing) {
+                if (!$slot) {
+                    return;
+                }
+
+                $highlighted = $slot[$billing . '_highlighted'] ?? array();
+                $other       = $slot[$billing . '_other'] ?? array();
+                $hidden_attr = $billing === 'monthly' ? ' hidden' : '';
+
+                echo '<div class="fp-benefits fp-benefits--' . esc_attr($billing) . '"' . $hidden_attr . '>';
+                echo '<ul class="fp-benefits__highlighted">';
+
+                foreach ($highlighted as $point) {
+                    echo '<li>' . wp_kses_post(do_shortcode($point)) . '</li>';
+                }
+
+                echo '</ul>';
+
+                if ($other) {
+                    echo '<div class="fp-benefits__more" hidden>';
+                    echo '<ul>';
+                    foreach ($other as $point) {
+                        echo '<li>' . wp_kses_post(do_shortcode($point)) . '</li>';
+                    }
+                    echo '</ul>';
+                    echo '</div>';
+
+                    echo '<button type="button" class="fp-benefits-toggle" aria-expanded="false">';
+                    echo '<span class="fp-benefits-toggle__closed">See all benefits (' . esc_html((string) count($other)) . ')</span>';
+                    echo '<span class="fp-benefits-toggle__open" hidden>Show fewer benefits</span>';
+                    echo '</button>';
+                }
+
+                echo '</div>';
+            };
+
+            $fp_render_card = static function ($slot, $featured = false, $premium = false) use ($fp_render_points) {
+                if (!$slot) {
+                    return;
+                }
+
+                $classes = array('fp-card');
+                if ($featured) {
+                    $classes[] = 'fp-card--featured';
+                }
+                if ($premium) {
+                    $classes[] = 'fp-card--premium';
+                }
+
+                $guidance = '';
+                if ($slot['slot'] === 'primary') {
+                    $guidance = 'I manage my website.';
+                } elseif ($slot['slot'] === 'featured') {
+                    $guidance = 'I want WPHQ to handle my website for me.';
+                } elseif ($slot['short_description']) {
+                    $guidance = $slot['short_description'];
+                }
+
+                ?>
+                <article
+                    class="<?php echo esc_attr(implode(' ', $classes)); ?> fp-clickable-card"
+                    role="link"
+                    tabindex="0"
+                    aria-label="Select <?php echo esc_attr($slot['title']); ?>"
+                    data-monthly-id="<?php echo esc_attr($slot['monthly_id']); ?>"
+                    data-annual-id="<?php echo esc_attr($slot['annual_id']); ?>"
+                    data-monthly-price="<?php echo esc_attr(wp_json_encode($slot['monthly_price'])); ?>"
+                    data-annual-price="<?php echo esc_attr(wp_json_encode($slot['annual_price'])); ?>"
+                    data-monthly-url="<?php echo esc_url($slot['monthly_url']); ?>"
+                    data-annual-url="<?php echo esc_url($slot['annual_url']); ?>"
+                >
+                    <?php if ($slot['icon_url']): ?>
+                        <div class="fp-card__icon"><img src="<?php echo esc_url($slot['icon_url']); ?>" alt=""></div>
+                    <?php endif; ?>
+
+                    <?php if ($slot['plan_name']): ?>
+                        <div class="fp-card__tier"><?php echo esc_html($slot['plan_name']); ?></div>
+                    <?php endif; ?>
+
+                    <h3><?php echo esc_html($slot['title']); ?></h3>
+
+                    <?php if ($guidance): ?>
+                        <p class="fp-card__guidance"><?php echo esc_html($guidance); ?></p>
+                    <?php endif; ?>
+
+                    <div class="fp-card__price"><?php echo wp_kses_post($slot['annual_price']); ?></div>
+                    <div class="fp-card__period">per year</div>
+
+                    <?php if ($slot['save_amount'] > 0): ?>
+                        <div class="fp-card__savings">Save <?php echo wp_kses_post(wc_price($slot['save_amount'])); ?> with annual billing</div>
+                    <?php endif; ?>
+
+                    <div class="fp-card__divider"></div>
+
+                    <?php $fp_render_points($slot, 'monthly'); ?>
+                    <?php $fp_render_points($slot, 'annual'); ?>
+
+                    <a
+                        class="fp-select-plan wphq-select-plan-button"
+                        href="<?php echo esc_url($slot['annual_url']); ?>"
+                        data-product-id="<?php echo esc_attr($slot['annual_id']); ?>"
+                        rel="nofollow"
+                    >Select Plan</a>
+                </article>
+                <?php
+            };
+
+            if ($fp_primary || $fp_featured || $fp_alternate || $fp_premium_1 || $fp_premium_2):
+            ?>
+            <section id="featured-pricing" class="featured-pricing" data-default-billing="annual">
+                <div class="container">
+
+                    <header class="fp-heading">
+                        <?php if ($fp_eyebrow): ?>
+                            <div class="fp-eyebrow"><?php echo esc_html($fp_eyebrow); ?></div>
+                        <?php endif; ?>
+
+                        <h2><?php echo esc_html($fp_title); ?></h2>
+
+                        <?php if ($fp_intro): ?>
+                            <p><?php echo esc_html($fp_intro); ?></p>
+                        <?php endif; ?>
+
+                        <div class="fp-billing-selector" aria-label="Subscription billing period">
+                            <span class="fp-billing-label fp-billing-label--monthly">Monthly</span>
+                            <label class="fp-billing-toggle">
+                                <input type="checkbox" class="fp-billing-toggle__input" checked aria-label="Toggle annual billing">
+                                <span class="fp-billing-toggle__track" aria-hidden="true">
+                                    <span class="fp-billing-toggle__thumb"></span>
+                                </span>
+                            </label>
+                            <span class="fp-billing-label fp-billing-label--annual is-active">Annual</span>
+                            <span class="fp-billing-savings">Save more &amp; unlock annual benefits</span>
+                        </div>
+                    </header>
+
+                    <?php if ($fp_show_website_banner): ?>
+                        <div class="fp-website-banner" data-annual-only>
+                            <div class="fp-website-banner__icon" aria-hidden="true">🎁</div>
+                            <div>
+                                <strong>Your New Website Is Included With Annual Hosting Plans</strong>
+                                <p>Need a new website? Choose an eligible annual hosting plan and WPHQ will build your professional WordPress starter website at no additional cost.</p>
+                                <a href="/free-website-details/?wphq_event=view_free_website&amp;wphq_source=featured_pricing">See what's included →</a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="fp-primary-grid">
+                        <?php if ($fp_primary): ?>
+                            <div class="fp-primary-grid__item">
+                                <?php $fp_render_card($fp_primary, false, false); ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($fp_featured): ?>
+                            <div class="fp-primary-grid__item fp-primary-grid__item--featured">
+                                <div class="fp-featured-badge">★ <?php echo esc_html($fp_badge_text); ?></div>
+                                <?php $fp_render_card($fp_featured, true, false); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ($fp_alternate): ?>
+                        <div
+                            class="fp-alternate fp-clickable-card"
+                            role="link"
+                            tabindex="0"
+                            aria-label="Select <?php echo esc_attr($fp_alternate['title']); ?>"
+                            data-monthly-id="<?php echo esc_attr($fp_alternate['monthly_id']); ?>"
+                            data-annual-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
+                            data-monthly-price="<?php echo esc_attr(wp_json_encode($fp_alternate['monthly_price'])); ?>"
+                            data-annual-price="<?php echo esc_attr(wp_json_encode($fp_alternate['annual_price'])); ?>"
+                            data-monthly-url="<?php echo esc_url($fp_alternate['monthly_url']); ?>"
+                            data-annual-url="<?php echo esc_url($fp_alternate['annual_url']); ?>"
+                        >
+                            <div class="fp-alternate__intro">
+                                <strong><?php echo esc_html($fp_alternate_intro); ?></strong>
+                                <span>WPHQ can maintain and support your WordPress site without requiring you to move your hosting.</span>
+                            </div>
+                            <div class="fp-alternate__plan">
+                                <?php if ($fp_alternate['plan_name']): ?>
+                                    <span class="fp-alternate__tier"><?php echo esc_html($fp_alternate['plan_name']); ?></span>
+                                <?php endif; ?>
+                                <strong><?php echo esc_html($fp_alternate['title']); ?></strong>
+                            </div>
+                            <div class="fp-alternate__price">
+                                <span class="fp-card__price"><?php echo wp_kses_post($fp_alternate['annual_price']); ?></span>
+                                <small class="fp-card__period">per year</small>
+                            </div>
+                            <a
+                                class="fp-alternate__button wphq-select-plan-button"
+                                href="<?php echo esc_url($fp_alternate['annual_url']); ?>"
+                                data-product-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
+                                rel="nofollow"
+                            >Select Plan</a>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($fp_premium_1 || $fp_premium_2): ?>
+                        <div class="fp-premium-heading">
+                            <h3><?php echo esc_html($fp_premium_title); ?></h3>
+                            <?php if ($fp_premium_intro): ?>
+                                <p><?php echo esc_html($fp_premium_intro); ?></p>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="fp-premium-grid">
+                            <?php if ($fp_premium_1): ?>
+                                <?php $fp_render_card($fp_premium_1, false, true); ?>
+                            <?php endif; ?>
+
+                            <?php if ($fp_premium_2): ?>
+                                <?php $fp_render_card($fp_premium_2, false, true); ?>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="fp-common-benefits">
+                        <button type="button" class="fp-common-benefits__toggle" aria-expanded="true">
+                            <span>All Plans Include</span>
+                            <span class="fp-common-benefits__toggle-text">Hide</span>
+                        </button>
+                        <div class="fp-common-benefits__content">
+                            <div><strong>🔒 Secure &amp; Reliable</strong><span>Professional WordPress infrastructure and SSL.</span></div>
+                            <div><strong>🛟 Expert Support</strong><span>Real help when you need it.</span></div>
+                            <div><strong>⚡ Performance Focused</strong><span>Built for speed and reliability.</span></div>
+                            <div><strong>🏷 Developer Discounts</strong><span>Annual members save on additional development time.</span></div>
+                        </div>
+                    </div>
+
+                    <p class="fp-terms-note">* Included monthly website edit/development time does not roll over and is subject to the terms of the applicable membership.</p>
+                </div>
+            </section>
+
+            <style>
+                .featured-pricing,
+                .featured-pricing * { box-sizing: border-box; }
+
+                .featured-pricing {
+                    padding: 74px 0;
+                    background: #fff;
+                    color: #17313d;
+                }
+
+                .featured-pricing .container {
+                    max-width: 1180px;
+                    margin: 0 auto;
+                }
+
+                .fp-heading {
+                    max-width: 850px;
+                    margin: 0 auto 32px;
+                    text-align: center;
+                }
+
+                .fp-eyebrow {
+                    margin-bottom: 7px;
+                    color: #df6f27;
+                    font-size: 13px;
+                    font-weight: 800;
+                    letter-spacing: 1.2px;
+                    text-transform: uppercase;
+                }
+
+                .fp-heading h2 {
+                    margin: 0 0 12px;
+                    color: #17313d;
+                    font-size: clamp(32px, 4.5vw, 52px);
+                    line-height: 1.08;
+                }
+
+                .fp-heading > p {
+                    max-width: 720px;
+                    margin: 0 auto;
+                    color: #53636b;
+                    font-size: 16px;
+                    line-height: 1.65;
+                }
+
+                .fp-billing-selector {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    gap: 11px;
+                    margin-top: 25px;
+                    font-weight: 700;
+                }
+
+                .fp-billing-label {
+                    opacity: .5;
+                    transition: opacity .2s ease;
+                }
+
+                .fp-billing-label.is-active {
+                    opacity: 1;
+                }
+
+                .fp-billing-toggle {
+                    display: inline-flex;
+                    cursor: pointer;
+                }
+
+                .fp-billing-toggle__input {
+                    position: absolute;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+
+                .fp-billing-toggle__track {
+                    position: relative;
+                    display: block;
+                    width: 54px;
+                    height: 30px;
+                    border-radius: 999px;
+                    background: #8b949b;
+                    transition: background .2s ease;
+                }
+
+                .fp-billing-toggle__thumb {
+                    position: absolute;
+                    top: 4px;
+                    left: 4px;
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 50%;
+                    background: #fff;
+                    box-shadow: 0 1px 4px rgba(0,0,0,.22);
+                    transition: transform .2s ease;
+                }
+
+                .fp-billing-toggle__input:checked + .fp-billing-toggle__track {
+                    background: #df6f27;
+                }
+
+                .fp-billing-toggle__input:checked + .fp-billing-toggle__track .fp-billing-toggle__thumb {
+                    transform: translateX(24px);
+                }
+
+                .fp-billing-savings {
+                    color: #29945b;
+                    font-size: 13px;
+                }
+
+                .fp-website-banner {
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                    max-width: 1040px;
+                    margin: 0 auto 38px;
+                    padding: 20px 24px;
+                    border: 1px solid #bcdccc;
+                    border-radius: 12px;
+                    background: #f1faf5;
+                }
+
+                .fp-website-banner__icon {
+                    display: flex;
+                    width: 54px;
+                    height: 54px;
+                    flex: 0 0 54px;
+                    align-items: center;
+                    justify-content: center;
+                    border: 2px solid #29945b;
+                    border-radius: 50%;
+                    font-size: 26px;
+                }
+
+                .fp-website-banner strong {
+                    display: block;
+                    margin-bottom: 4px;
+                    color: #17313d;
+                    font-size: 18px;
+                }
+
+                .fp-website-banner p {
+                    margin: 0 0 6px;
+                    color: #52636b;
+                    line-height: 1.5;
+                }
+
+                .fp-website-banner a {
+                    color: #df6f27;
+                    font-weight: 700;
+                }
+
+                .fp-primary-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 24px;
+                    max-width: 920px;
+                    margin: 0 auto;
+                    align-items: stretch;
+                }
+
+                .fp-primary-grid__item {
+                    position: relative;
+                    min-width: 0;
+                }
+
+                .fp-featured-badge {
+                    position: absolute;
+                    z-index: 2;
+                    top: -15px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    padding: 7px 18px;
+                    border-radius: 999px;
+                    background: #df6f27;
+                    color: #fff;
+                    font-size: 12px;
+                    font-weight: 800;
+                    letter-spacing: .35px;
+                    text-transform: uppercase;
+                    white-space: nowrap;
+                }
+
+                .fp-clickable-card {
+                    cursor: pointer;
+                    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+                }
+
+                .fp-clickable-card:hover,
+                .fp-clickable-card:focus-visible {
+                    transform: translateY(-2px);
+                    box-shadow: 0 14px 36px rgba(23,49,61,.12);
+                    outline: none;
+                }
+
+                .fp-card {
+                    display: flex;
+                    min-height: 100%;
+                    flex-direction: column;
+                    padding: 32px;
+                    border: 1px solid #cad5da;
+                    border-radius: 15px;
+                    background: #fff;
+                    box-shadow: 0 8px 25px rgba(23,49,61,.06);
+                }
+
+                .fp-card--featured {
+                    border: 2px solid #17313d;
+                    background: linear-gradient(180deg,#f5f9ff 0,#fff 44%);
+                    box-shadow: 0 12px 34px rgba(23,49,61,.11);
+                }
+
+                .fp-card--premium {
+                    border: 1px solid #c8d3d8;
+                    border-top: 9px solid #17313d;
+                }
+
+                .fp-card__icon {
+                    display: flex;
+                    width: 52px;
+                    height: 52px;
+                    margin: 0 auto 10px;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    border-radius: 50%;
+                    background: #17313d;
+                }
+
+                .fp-card__icon img {
+                    max-width: 31px;
+                    max-height: 31px;
+                    object-fit: contain;
+                }
+
+                .fp-card__tier {
+                    margin-bottom: 5px;
+                    color: #56666e;
+                    font-size: 12px;
+                    font-weight: 800;
+                    letter-spacing: .7px;
+                    text-align: center;
+                    text-transform: uppercase;
+                }
+
+                .fp-card h3 {
+                    margin: 0;
+                    color: #17313d;
+                    font-size: 27px;
+                    line-height: 1.15;
+                    text-align: center;
+                }
+
+                .fp-card__guidance {
+                    min-height: 46px;
+                    margin: 10px auto 18px;
+                    color: #53636b;
+                    line-height: 1.5;
+                    text-align: center;
+                }
+
+                .fp-card__price {
+                    color: #17313d;
+                    font-size: 38px;
+                    font-weight: 800;
+                    line-height: 1.05;
+                    text-align: center;
+                }
+
+                .fp-card__price .woocommerce-Price-amount {
+                    color: inherit;
+                }
+
+                .fp-card__period {
+                    margin-top: 5px;
+                    color: #66757c;
+                    font-size: 14px;
+                    text-align: center;
+                }
+
+                .fp-card__savings {
+                    min-height: 22px;
+                    margin-top: 7px;
+                    color: #29945b;
+                    font-size: 13px;
+                    font-weight: 700;
+                    text-align: center;
+                }
+
+                .fp-card__divider {
+                    height: 1px;
+                    margin: 24px 0 17px;
+                    background: #dce3e6;
+                }
+
+                .fp-benefits {
+                    margin-bottom: 20px;
+                }
+
+                .fp-benefits ul {
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                }
+
+                .fp-benefits li {
+                    position: relative;
+                    margin: 0 0 11px;
+                    padding-left: 24px;
+                    color: #344950;
+                    font-size: 14px;
+                    line-height: 1.45;
+                }
+
+                .fp-benefits li::before {
+                    position: absolute;
+                    left: 0;
+                    content: "✓";
+                    color: #df6f27;
+                    font-weight: 900;
+                }
+
+                .fp-benefits__more {
+                    margin-top: 8px;
+                }
+
+                .fp-benefits-toggle {
+                    width: 100%;
+                    margin-top: 8px;
+                    padding: 9px 12px;
+                    border: 1px solid #cadce6;
+                    border-radius: 7px;
+                    background: #f7fafc;
+                    color: #17313d;
+                    cursor: pointer;
+                    font-weight: 700;
+                }
+
+                .fp-select-plan {
+                    display: block;
+                    width: 100%;
+                    margin-top: auto;
+                    padding: 13px 18px;
+                    border: 2px solid #df6f27;
+                    border-radius: 8px;
+                    background: #fff;
+                    color: #df6f27 !important;
+                    font-weight: 800;
+                    text-align: center;
+                    text-decoration: none;
+                }
+
+                .fp-card--featured .fp-select-plan {
+                    background: #df6f27;
+                    color: #fff !important;
+                }
+
+                .fp-alternate {
+                    display: grid;
+                    grid-template-columns: 1.7fr .8fr .65fr auto;
+                    gap: 22px;
+                    max-width: 1040px;
+                    margin: 28px auto 48px;
+                    padding: 20px 24px;
+                    align-items: center;
+                    border: 1px solid #ebcfaa;
+                    border-radius: 12px;
+                    background: #fff9f0;
+                }
+
+                .fp-alternate__intro strong,
+                .fp-alternate__plan strong {
+                    display: block;
+                    margin-bottom: 3px;
+                    color: #17313d;
+                }
+
+                .fp-alternate__intro span {
+                    color: #617078;
+                    font-size: 14px;
+                    line-height: 1.45;
+                }
+
+                .fp-alternate__tier {
+                    display: block;
+                    margin-bottom: 3px;
+                    color: #df6f27;
+                    font-size: 11px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                }
+
+                .fp-alternate__price .fp-card__price {
+                    font-size: 28px;
+                    text-align: left;
+                }
+
+                .fp-alternate__price .fp-card__period {
+                    display: block;
+                    text-align: left;
+                }
+
+                .fp-alternate__button {
+                    display: inline-block;
+                    padding: 10px 18px;
+                    border: 2px solid #df6f27;
+                    border-radius: 7px;
+                    color: #df6f27 !important;
+                    font-weight: 800;
+                    text-decoration: none;
+                    white-space: nowrap;
+                }
+
+                .fp-premium-heading {
+                    margin: 0 auto 22px;
+                    text-align: center;
+                }
+
+                .fp-premium-heading h3 {
+                    margin: 0 0 6px;
+                    color: #17313d;
+                    font-size: 25px;
+                    text-transform: uppercase;
+                }
+
+                .fp-premium-heading p {
+                    margin: 0;
+                    color: #607078;
+                }
+
+                .fp-premium-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0,1fr));
+                    gap: 24px;
+                    max-width: 1040px;
+                    margin: 0 auto;
+                }
+
+                .fp-common-benefits {
+                    max-width: 1100px;
+                    margin: 30px auto 0;
+                    overflow: hidden;
+                    border: 1px solid #ccdce4;
+                    border-radius: 12px;
+                    background: #f6fbfe;
+                }
+
+                .fp-common-benefits__toggle {
+                    display: flex;
+                    width: 100%;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 11px 14px;
+                    border: 0;
+                    background: transparent;
+                    color: #17313d;
+                    cursor: pointer;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                }
+
+                .fp-common-benefits__content {
+                    display: grid;
+                    grid-template-columns: repeat(4,minmax(0,1fr));
+                    border-top: 1px solid #dce7ec;
+                }
+
+                .fp-common-benefits__content > div {
+                    padding: 20px 16px;
+                    text-align: center;
+                }
+
+                .fp-common-benefits__content > div + div {
+                    border-left: 1px solid #dce7ec;
+                }
+
+                .fp-common-benefits__content strong {
+                    display: block;
+                    margin-bottom: 6px;
+                    color: #17313d;
+                }
+
+                .fp-common-benefits__content span {
+                    color: #63737a;
+                    font-size: 13px;
+                    line-height: 1.45;
+                }
+
+                .fp-terms-note {
+                    max-width: 900px;
+                    margin: 17px auto 0;
+                    color: #6d797f;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    text-align: center;
+                }
+
+                @media (max-width: 850px) {
+                    .featured-pricing {
+                        padding: 54px 0;
+                    }
+
+                    .fp-primary-grid,
+                    .fp-premium-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .fp-primary-grid {
+                        max-width: 620px;
+                    }
+
+                    .fp-alternate {
+                        grid-template-columns: 1fr 1fr;
+                    }
+
+                    .fp-common-benefits__content {
+                        grid-template-columns: repeat(2,minmax(0,1fr));
+                    }
+
+                    .fp-common-benefits__content > div + div {
+                        border-left: 0;
+                    }
+                }
+
+                @media (max-width: 600px) {
+                    .fp-heading h2 {
+                        font-size: 34px;
+                    }
+
+                    .fp-website-banner {
+                        align-items: flex-start;
+                    }
+
+                    .fp-card {
+                        padding: 27px 22px;
+                    }
+
+                    .fp-alternate {
+                        grid-template-columns: 1fr;
+                        text-align: center;
+                    }
+
+                    .fp-alternate__price .fp-card__price,
+                    .fp-alternate__price .fp-card__period {
+                        text-align: center;
+                    }
+
+                    .fp-alternate__button {
+                        display: block;
+                    }
+
+                    .fp-common-benefits__content {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .fp-common-benefits__content > div {
+                        border-top: 1px solid #dce7ec;
+                    }
+                }
+            </style>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var root = document.getElementById('featured-pricing');
+                    if (!root) return;
+
+                    var toggle = root.querySelector('.fp-billing-toggle__input');
+                    var monthlyLabel = root.querySelector('.fp-billing-label--monthly');
+                    var annualLabel = root.querySelector('.fp-billing-label--annual');
+                    var annualOnly = root.querySelectorAll('[data-annual-only]');
+
+                    function decodeHtmlValue(value) {
+                        if (!value) return '';
+                        try {
+                            return JSON.parse(value);
+                        } catch (error) {
+                            return value;
+                        }
+                    }
+
+                    function updateBilling() {
+                        var useAnnual = !toggle || toggle.checked;
+
+                        if (monthlyLabel) monthlyLabel.classList.toggle('is-active', !useAnnual);
+                        if (annualLabel) annualLabel.classList.toggle('is-active', useAnnual);
+
+                        annualOnly.forEach(function (item) {
+                            item.hidden = !useAnnual;
+                        });
+
+                        root.querySelectorAll('.fp-card, .fp-alternate').forEach(function (card) {
+                            var price = card.querySelector('.fp-card__price');
+                            var period = card.querySelector('.fp-card__period');
+                            var button = card.querySelector('.wphq-select-plan-button');
+                            var monthlyBenefits = card.querySelector('.fp-benefits--monthly');
+                            var annualBenefits = card.querySelector('.fp-benefits--annual');
+
+                            var priceHtml = decodeHtmlValue(useAnnual ? card.dataset.annualPrice : card.dataset.monthlyPrice);
+                            var productId = useAnnual ? card.dataset.annualId : card.dataset.monthlyId;
+                            var productUrl = useAnnual ? card.dataset.annualUrl : card.dataset.monthlyUrl;
+
+                            if (price) price.innerHTML = priceHtml;
+                            if (period) period.textContent = useAnnual ? 'per year' : 'per month';
+
+                            if (button) {
+                                button.href = productUrl || '#';
+                                button.dataset.productId = productId || '';
+                                button.setAttribute('data-product-id', productId || '');
+                            }
+
+                            if (monthlyBenefits) monthlyBenefits.hidden = useAnnual;
+                            if (annualBenefits) annualBenefits.hidden = !useAnnual;
+                        });
+                    }
+
+                    if (toggle) {
+                        toggle.addEventListener('change', updateBilling);
+                    }
+
+                    root.addEventListener('click', function (event) {
+                        var benefitToggle = event.target.closest('.fp-benefits-toggle');
+                        if (benefitToggle) {
+                            var benefits = benefitToggle.closest('.fp-benefits');
+                            var more = benefits ? benefits.querySelector('.fp-benefits__more') : null;
+                            var closedLabel = benefitToggle.querySelector('.fp-benefits-toggle__closed');
+                            var openLabel = benefitToggle.querySelector('.fp-benefits-toggle__open');
+
+                            if (more) {
+                                var expanding = more.hidden;
+                                more.hidden = !expanding;
+                                benefitToggle.setAttribute('aria-expanded', expanding ? 'true' : 'false');
+                                if (closedLabel) closedLabel.hidden = expanding;
+                                if (openLabel) openLabel.hidden = !expanding;
+                            }
+                            return;
+                        }
+
+                        var commonToggle = event.target.closest('.fp-common-benefits__toggle');
+                        if (commonToggle) {
+                            var content = root.querySelector('.fp-common-benefits__content');
+                            var label = commonToggle.querySelector('.fp-common-benefits__toggle-text');
+                            if (content) {
+                                var expanded = commonToggle.getAttribute('aria-expanded') === 'true';
+                                content.hidden = expanded;
+                                commonToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                                if (label) label.textContent = expanded ? 'Show' : 'Hide';
+                            }
+                            return;
+                        }
+
+                        var selectPlanButton = event.target.closest('.wphq-select-plan-button');
+                        if (selectPlanButton) {
+                            /*
+                             * Keep these as normal WooCommerce navigation requests.
+                             * This mirrors the existing pricing_table behavior and avoids
+                             * theme/side-cart AJAX conflicts when billing changes dynamically.
+                             */
+                            event.stopPropagation();
+                            return;
+                        }
+
+                        /*
+                         * Whole-card selection:
+                         * Clicking plain card content follows the active Select Plan URL.
+                         * Inner links, expanders, buttons, and form controls retain their
+                         * own behavior and are never hijacked.
+                         */
+                        var card = event.target.closest('.fp-clickable-card');
+
+                        if (card) {
+                            var interactive = event.target.closest(
+                                'a, button, input, select, textarea, label, summary, details'
+                            );
+
+                            if (interactive) {
+                                return;
+                            }
+
+                            var cardButton = card.querySelector('.wphq-select-plan-button');
+
+                            if (cardButton && cardButton.href) {
+                                window.location.href = cardButton.href;
+                            }
+                        }
+                    }, true);
+
+                    root.addEventListener('keydown', function (event) {
+                        var card = event.target.closest('.fp-clickable-card');
+
+                        if (!card || (event.key !== 'Enter' && event.key !== ' ')) {
+                            return;
+                        }
+
+                        var interactive = event.target.closest(
+                            'a, button, input, select, textarea, label, summary, details'
+                        );
+
+                        if (interactive && interactive !== card) {
+                            return;
+                        }
+
+                        event.preventDefault();
+
+                        var cardButton = card.querySelector('.wphq-select-plan-button');
+
+                        if (cardButton && cardButton.href) {
+                            window.location.href = cardButton.href;
+                        }
+                    });
+
+                    updateBilling();
+                });
+            </script>
+
+            <?php endif; ?>
+
+
         <?php elseif( get_row_layout() == 'pricing_table' ):
             /*
              * ACF structure:
