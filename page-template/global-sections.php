@@ -281,8 +281,9 @@ if( have_rows('sections') ):
              * - monthly_product
              * - annual_product
              *
-             * If those fields do not exist or are empty, the component falls back
-             * to matching by plan_name / normalized product title.
+             * If those fields do not exist or are empty, the component safely
+             * uses the selected product for both billing states without scanning
+             * the WooCommerce catalog.
              */
 
             $fp_primary_ref   = get_sub_field('primary_plan');
@@ -331,18 +332,6 @@ if( have_rows('sections') ):
              * Example:
              * "Hosting Only Annual" and "Hosting Only" => "hosting only"
              */
-            $fp_normalize_title = static function ($title) {
-                $title = wp_strip_all_tags((string) $title);
-                $title = preg_replace('/\b(monthly|annual|yearly|year|month)\b/i', ' ', $title);
-                $title = preg_replace('/\s+/', ' ', $title);
-                return trim(strtolower($title));
-            };
-
-            /*
-             * Determine the billing period of a WooCommerce subscription product.
-             * Falls back to the product title if WooCommerce Subscriptions helpers
-             * are unavailable.
-             */
             $fp_get_period = static function ($product) {
                 if (!$product) {
                     return '';
@@ -370,35 +359,38 @@ if( have_rows('sections') ):
             };
 
             /*
-             * Build a small product cache once. Pairing is deterministic when
-             * product-level ACF fields monthly_product / annual_product are present.
-             * Otherwise fall back to plan_name / normalized title matching.
+             * Pair the selected product without scanning the WooCommerce catalog.
+             *
+             * Preferred setup:
+             * Add product-level ACF Post Object fields named monthly_product and
+             * annual_product. When populated, those exact products are used.
+             *
+             * Safe fallback:
+             * If no explicit pairing fields are populated, use only the selected
+             * product. This avoids wc_get_products(limit => -1), title matching,
+             * and catalog-wide ACF reads on every page render.
              */
-            $fp_all_products = wc_get_products(array(
-                'status' => 'publish',
-                'limit'  => -1,
-                'return' => 'objects',
-            ));
-
             $fp_pair_product = static function ($selected) use (
-                $fp_all_products,
                 $fp_get_period,
-                $fp_normalize_title,
                 $fp_get_product
             ) {
                 if (!$selected) {
-                    return array('monthly' => false, 'annual' => false, 'display' => false);
+                    return array(
+                        'monthly' => false,
+                        'annual'  => false,
+                        'display' => false,
+                    );
                 }
 
                 $selected_id = $selected->get_id();
 
-                /*
-                 * Preferred / deterministic path:
-                 * Add product-level ACF Post Object fields named monthly_product
-                 * and annual_product. When populated, those exact products win.
-                 */
-                $explicit_monthly = $fp_get_product(get_field('monthly_product', $selected_id));
-                $explicit_annual  = $fp_get_product(get_field('annual_product', $selected_id));
+                $explicit_monthly = $fp_get_product(
+                    get_field('monthly_product', $selected_id)
+                );
+
+                $explicit_annual = $fp_get_product(
+                    get_field('annual_product', $selected_id)
+                );
 
                 if ($explicit_monthly || $explicit_annual) {
                     $monthly = $explicit_monthly ?: $selected;
@@ -411,66 +403,14 @@ if( have_rows('sections') ):
                     );
                 }
 
-                $selected_period     = $fp_get_period($selected);
-                $selected_plan_name  = trim((string) get_field('plan_name', $selected_id));
-                $selected_base_title = $fp_normalize_title($selected->get_name());
-
-                $monthly = ($selected_period === 'monthly') ? $selected : false;
-                $annual  = ($selected_period === 'annual') ? $selected : false;
-
-                foreach ($fp_all_products as $candidate) {
-                    if (!$candidate || $candidate->get_id() === $selected_id) {
-                        continue;
-                    }
-
-                    $candidate_period = $fp_get_period($candidate);
-                    if (!$candidate_period || ($candidate_period !== 'monthly' && $candidate_period !== 'annual')) {
-                        continue;
-                    }
-
-                    $candidate_plan_name  = trim((string) get_field('plan_name', $candidate->get_id()));
-                    $candidate_base_title = $fp_normalize_title($candidate->get_name());
-
-                    $plan_name_matches = (
-                        $selected_plan_name !== '' &&
-                        $candidate_plan_name !== '' &&
-                        strcasecmp($selected_plan_name, $candidate_plan_name) === 0
-                    );
-
-                    $title_matches = (
-                        $selected_base_title !== '' &&
-                        $candidate_base_title === $selected_base_title
-                    );
-
-                    if (!$plan_name_matches && !$title_matches) {
-                        continue;
-                    }
-
-                    if ($candidate_period === 'monthly' && !$monthly) {
-                        $monthly = $candidate;
-                    }
-
-                    if ($candidate_period === 'annual' && !$annual) {
-                        $annual = $candidate;
-                    }
-                }
-
                 /*
-                 * Safe fallback so a missing sibling never breaks the card.
+                 * No explicit pair configured. Do not search the catalog.
+                 * Keep the component functional with the selected product only.
                  */
-                if (!$monthly && !$annual) {
-                    $monthly = $selected;
-                    $annual  = $selected;
-                } elseif (!$monthly) {
-                    $monthly = $annual;
-                } elseif (!$annual) {
-                    $annual = $monthly;
-                }
-
                 return array(
-                    'monthly' => $monthly,
-                    'annual'  => $annual,
-                    'display' => $monthly ?: $annual ?: $selected,
+                    'monthly' => $selected,
+                    'annual'  => $selected,
+                    'display' => $selected,
                 );
             };
 
@@ -554,8 +494,7 @@ if( have_rows('sections') ):
                 $fp_pair_product,
                 $fp_tracking_url,
                 $fp_apply_purchase_benefit,
-                $fp_get_period,
-                $fp_normalize_title
+                $fp_get_period
             ) {
                 $selected = $fp_get_product($ref);
                 if (!$selected) {
