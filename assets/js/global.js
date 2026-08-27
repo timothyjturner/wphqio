@@ -55,3 +55,27 @@ document.querySelectorAll(".hamburger").forEach((element) => {
         element.classList.toggle("is-active");
     });
 });
+
+(function(){
+    const params=new URLSearchParams(window.location.search);
+    const eventName=params.get('wphq_event');
+    const source=params.get('wphq_source');
+
+    if(!eventName)return;
+
+    if(typeof gtag==='function'){
+        gtag('event',eventName,{
+            source:source||'unknown'
+        });
+    }
+
+    params.delete('wphq_event');
+    params.delete('wphq_source');
+
+    const cleanQuery=params.toString();
+    const cleanUrl=window.location.pathname+
+        (cleanQuery?'?'+cleanQuery:'')+
+        window.location.hash;
+
+    window.history.replaceState({},document.title,cleanUrl);
+})();
