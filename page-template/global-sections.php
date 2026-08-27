@@ -292,6 +292,30 @@ if( have_rows('sections') ):
             $fp_premium_1_ref = get_sub_field('premium_plan_1');
             $fp_premium_2_ref = get_sub_field('premium_plan_2');
 
+            // Contextual onboarding emails configured per Featured Pricing slot/billing period.
+            $fp_purchase_email_refs = array(
+                'primary' => array(
+                    'monthly' => get_sub_field('primary_monthly_purchase_email'),
+                    'annual'  => get_sub_field('primary_annual_purchase_email'),
+                ),
+                'featured' => array(
+                    'monthly' => get_sub_field('featured_monthly_purchase_email'),
+                    'annual'  => get_sub_field('featured_annual_purchase_email'),
+                ),
+                'alternate' => array(
+                    'monthly' => get_sub_field('alternate_monthly_purchase_email'),
+                    'annual'  => get_sub_field('alternate_annual_purchase_email'),
+                ),
+                'premium_1' => array(
+                    'monthly' => get_sub_field('premium_1_monthly_purchase_email'),
+                    'annual'  => get_sub_field('premium_1_annual_purchase_email'),
+                ),
+                'premium_2' => array(
+                    'monthly' => get_sub_field('premium_2_monthly_purchase_email'),
+                    'annual'  => get_sub_field('premium_2_annual_purchase_email'),
+                ),
+            );
+
             $fp_show_website_banner = (bool) get_sub_field('show_website_included_banner');
             $fp_badge_text         = trim((string) get_sub_field('featured_badge_text'));
             $fp_eyebrow            = trim((string) get_sub_field('section_eyebrow'));
@@ -431,57 +455,49 @@ if( have_rows('sections') ):
 
 
             /*
-             * Preserve annual acquisition-benefit context on Featured Pricing URLs
-             * when the selected annual WooCommerce product stores these product-level
-             * ACF fields:
-             *
-             * - custom_purchase_email
-             * - benefit_key
-             *
-             * If those fields are absent, this safely does nothing.
+             * Attach the page-level Custom Product Email selected for this exact
+             * Featured Pricing slot + billing period. The existing functions.php
+             * purchase-email system validates the signed context, stores it on the
+             * cart/order item, and sends the selected onboarding email once.
              */
-            $fp_apply_purchase_benefit = static function ($url, $annual_product) use ($fp_get_product_id) {
-                if (!$annual_product) {
+            $fp_apply_purchase_email = static function ($url, $product, $email_ref) use ($fp_get_product_id) {
+                if (!$product || !$url || !$email_ref) {
                     return $url;
                 }
 
-                $product_id = $annual_product->get_id();
-
-                $custom_purchase_email_id = $fp_get_product_id(
-                    get_field('custom_purchase_email', $product_id)
-                );
-
-                $benefit_key = sanitize_key(
-                    (string) get_field('benefit_key', $product_id)
-                );
-
-                if (!$benefit_key && $custom_purchase_email_id) {
-                    $email_post = get_post($custom_purchase_email_id);
-
-                    if ($email_post && $email_post->post_type === 'wphq_product_email') {
-                        $benefit_key = sanitize_key($email_post->post_name);
-                    }
-                }
+                $product_id = $product->get_id();
+                $email_id   = $fp_get_product_id($email_ref);
 
                 if (
-                    !$custom_purchase_email_id ||
-                    !$benefit_key ||
+                    !$email_id ||
                     !function_exists('wphq_is_valid_custom_purchase_email') ||
-                    !wphq_is_valid_custom_purchase_email($custom_purchase_email_id) ||
+                    !wphq_is_valid_custom_purchase_email($email_id) ||
                     !function_exists('wphq_build_benefit_signature')
                 ) {
                     return $url;
                 }
 
+                $email_post = get_post($email_id);
+                if (!$email_post || $email_post->post_type !== 'wphq_product_email') {
+                    return $url;
+                }
+
+                // Reuse the existing contextual-email transport key. For generic
+                // onboarding emails this is simply the selected email post slug.
+                $benefit_key = sanitize_key($email_post->post_name);
+                if (!$benefit_key) {
+                    return $url;
+                }
+
                 $signature = wphq_build_benefit_signature(
                     $product_id,
-                    $custom_purchase_email_id,
+                    $email_id,
                     $benefit_key
                 );
 
                 return add_query_arg(
                     array(
-                        'wphq_purchase_email' => $custom_purchase_email_id,
+                        'wphq_purchase_email' => $email_id,
                         'wphq_benefit_key'    => $benefit_key,
                         'wphq_benefit_sig'    => $signature,
                     ),
@@ -493,7 +509,8 @@ if( have_rows('sections') ):
                 $fp_get_product,
                 $fp_pair_product,
                 $fp_tracking_url,
-                $fp_apply_purchase_benefit,
+                $fp_apply_purchase_email,
+                $fp_purchase_email_refs,
                 $fp_get_period
             ) {
                 $selected = $fp_get_product($ref);
@@ -582,23 +599,37 @@ if( have_rows('sections') ):
                 $monthly_split = $split_points($monthly_points);
                 $annual_split  = $split_points($annual_points);
 
+                $slot_key_clean = sanitize_key($slot_key);
+                $slot_emails    = isset($fp_purchase_email_refs[$slot_key_clean])
+                    ? $fp_purchase_email_refs[$slot_key_clean]
+                    : array();
+
+                $monthly_base_url = $monthly ? $monthly->add_to_cart_url() : '';
+                if ($monthly && $monthly_base_url) {
+                    $monthly_base_url = $fp_apply_purchase_email(
+                        $monthly_base_url,
+                        $monthly,
+                        $slot_emails['monthly'] ?? false
+                    );
+                }
+
                 $monthly_url = $monthly ? $fp_tracking_url(
-                    $monthly->add_to_cart_url(),
-                    'featured_pricing_' . sanitize_key($slot_key) . '_monthly'
+                    $monthly_base_url,
+                    'featured_pricing_' . $slot_key_clean . '_monthly'
                 ) : '';
 
                 $annual_base_url = $annual ? $annual->add_to_cart_url() : '';
-
                 if ($annual && $annual_base_url) {
-                    $annual_base_url = $fp_apply_purchase_benefit(
+                    $annual_base_url = $fp_apply_purchase_email(
                         $annual_base_url,
-                        $annual
+                        $annual,
+                        $slot_emails['annual'] ?? false
                     );
                 }
 
                 $annual_url = $annual ? $fp_tracking_url(
                     $annual_base_url,
-                    'featured_pricing_' . sanitize_key($slot_key) . '_annual'
+                    'featured_pricing_' . $slot_key_clean . '_annual'
                 ) : '';
 
                 $monthly_price = $monthly ? $monthly->get_price_html() : '';
