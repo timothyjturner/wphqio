@@ -814,26 +814,44 @@ if( have_rows('sections') ):
                             data-monthly-url="<?php echo esc_url($fp_alternate['monthly_url']); ?>"
                             data-annual-url="<?php echo esc_url($fp_alternate['annual_url']); ?>"
                         >
-                            <div class="fp-alternate__intro">
-                                <strong><?php echo esc_html($fp_alternate_intro); ?></strong>
-                                <span>WPHQ can maintain and support your WordPress site without requiring you to move your hosting.</span>
+                            <div class="fp-alternate__top">
+                                <div class="fp-alternate__intro">
+                                    <strong><?php echo esc_html($fp_alternate_intro); ?></strong>
+                                    <span>WPHQ can maintain and support your WordPress site without requiring you to move your hosting.</span>
+                                </div>
+
+                                <div class="fp-alternate__plan">
+                                    <?php if ($fp_alternate['icon_url']): ?>
+                                        <div class="fp-card__icon fp-alternate__icon">
+                                            <img src="<?php echo esc_url($fp_alternate['icon_url']); ?>" alt="">
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div>
+                                        <?php if ($fp_alternate['plan_name']): ?>
+                                            <span class="fp-alternate__tier"><?php echo esc_html($fp_alternate['plan_name']); ?></span>
+                                        <?php endif; ?>
+                                        <strong><?php echo esc_html($fp_alternate['title']); ?></strong>
+                                    </div>
+                                </div>
+
+                                <div class="fp-alternate__price">
+                                    <span class="fp-card__price"><?php echo wp_kses_post($fp_alternate['annual_price']); ?></span>
+                                    <small class="fp-card__period">per year</small>
+                                </div>
+
+                                <a
+                                    class="fp-alternate__button wphq-select-plan-button"
+                                    href="<?php echo esc_url($fp_alternate['annual_url']); ?>"
+                                    data-product-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
+                                    rel="nofollow"
+                                >Select Plan</a>
                             </div>
-                            <div class="fp-alternate__plan">
-                                <?php if ($fp_alternate['plan_name']): ?>
-                                    <span class="fp-alternate__tier"><?php echo esc_html($fp_alternate['plan_name']); ?></span>
-                                <?php endif; ?>
-                                <strong><?php echo esc_html($fp_alternate['title']); ?></strong>
+
+                            <div class="fp-alternate__benefits">
+                                <?php $fp_render_points($fp_alternate, 'monthly'); ?>
+                                <?php $fp_render_points($fp_alternate, 'annual'); ?>
                             </div>
-                            <div class="fp-alternate__price">
-                                <span class="fp-card__price"><?php echo wp_kses_post($fp_alternate['annual_price']); ?></span>
-                                <small class="fp-card__period">per year</small>
-                            </div>
-                            <a
-                                class="fp-alternate__button wphq-select-plan-button"
-                                href="<?php echo esc_url($fp_alternate['annual_url']); ?>"
-                                data-product-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
-                                rel="nofollow"
-                            >Select Plan</a>
                         </div>
                     <?php endif; ?>
 
@@ -857,10 +875,7 @@ if( have_rows('sections') ):
                     <?php endif; ?>
 
                     <div class="fp-common-benefits">
-                        <button type="button" class="fp-common-benefits__toggle" aria-expanded="true">
-                            <span>All Plans Include</span>
-                            <span class="fp-common-benefits__toggle-text">Hide</span>
-                        </button>
+                        <div class="fp-common-benefits__heading">All Plans Include</div>
                         <div class="fp-common-benefits__content">
                             <div><strong>🔒 Secure &amp; Reliable</strong><span>Professional WordPress infrastructure and SSL.</span></div>
                             <div><strong>🛟 Expert Support</strong><span>Real help when you need it.</span></div>
@@ -1091,20 +1106,23 @@ if( have_rows('sections') ):
                 }
 
                 .fp-card__icon {
+                    width: 58px;
+                    height: 58px;
+                    margin: 0 auto 12px;
+                    padding: 8px;
                     display: flex;
-                    width: 52px;
-                    height: 52px;
-                    margin: 0 auto 10px;
                     align-items: center;
                     justify-content: center;
                     overflow: hidden;
+                    border: 2px solid #17313d;
                     border-radius: 50%;
-                    background: #17313d;
+                    background: white;
                 }
 
                 .fp-card__icon img {
-                    max-width: 31px;
-                    max-height: 31px;
+                    display: block;
+                    width: 100%;
+                    height: 100%;
                     object-fit: contain;
                 }
 
@@ -1231,16 +1249,20 @@ if( have_rows('sections') ):
                 }
 
                 .fp-alternate {
-                    display: grid;
-                    grid-template-columns: 1.7fr .8fr .65fr auto;
-                    gap: 22px;
-                    max-width: 1040px;
-                    margin: 28px auto 48px;
-                    padding: 20px 24px;
-                    align-items: center;
-                    border: 1px solid #ebcfaa;
+                    max-width: 1100px;
+                    margin: 28px auto 42px;
+                    overflow: hidden;
+                    border: 1px solid #edc991;
                     border-radius: 12px;
                     background: #fff9f0;
+                }
+
+                .fp-alternate__top {
+                    display: grid;
+                    grid-template-columns: minmax(240px, 1.5fr) minmax(180px, .9fr) minmax(150px, .65fr) auto;
+                    gap: 22px;
+                    align-items: center;
+                    padding: 20px 22px;
                 }
 
                 .fp-alternate__intro strong,
@@ -1254,6 +1276,20 @@ if( have_rows('sections') ):
                     color: #617078;
                     font-size: 14px;
                     line-height: 1.45;
+                }
+
+                .fp-alternate__plan {
+                    display: flex;
+                    gap: 12px;
+                    align-items: center;
+                }
+
+                .fp-alternate__icon {
+                    flex: 0 0 46px;
+                    width: 46px;
+                    height: 46px;
+                    margin: 0;
+                    padding: 7px;
                 }
 
                 .fp-alternate__tier {
@@ -1284,6 +1320,27 @@ if( have_rows('sections') ):
                     font-weight: 800;
                     text-decoration: none;
                     white-space: nowrap;
+                }
+
+                .fp-alternate__benefits {
+                    padding: 0 22px 20px;
+                }
+
+                .fp-alternate__benefits .fp-benefits {
+                    padding-top: 17px;
+                    border-top: 1px solid #eddcc2;
+                }
+
+                .fp-alternate__benefits .fp-benefits__highlighted,
+                .fp-alternate__benefits .fp-benefits__more ul {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    column-gap: 28px;
+                    row-gap: 8px;
+                }
+
+                .fp-alternate__benefits .fp-benefits-toggle {
+                    margin-top: 12px;
                 }
 
                 .fp-premium-heading {
@@ -1320,17 +1377,11 @@ if( have_rows('sections') ):
                     background: #f6fbfe;
                 }
 
-                .fp-common-benefits__toggle {
-                    display: flex;
-                    width: 100%;
-                    justify-content: center;
-                    gap: 8px;
+                .fp-common-benefits__heading {
                     padding: 11px 14px;
-                    border: 0;
-                    background: transparent;
                     color: #17313d;
-                    cursor: pointer;
                     font-weight: 800;
+                    text-align: center;
                     text-transform: uppercase;
                 }
 
@@ -1341,7 +1392,12 @@ if( have_rows('sections') ):
                 }
 
                 .fp-common-benefits__content > div {
+                    min-height: 105px;
                     padding: 20px 16px;
+                    justify-content: center;
+                    align-items: center;
+                    display: flex;
+                    flex-direction: column;
                     text-align: center;
                 }
 
@@ -1432,6 +1488,29 @@ if( have_rows('sections') ):
                         border-top: 1px solid #dce7ec;
                     }
                 }
+
+                @media (max-width: 900px) {
+                    .fp-alternate__top {
+                        grid-template-columns: 1fr 1fr;
+                    }
+
+                    .fp-alternate__button {
+                        justify-self: start;
+                    }
+                }
+
+                @media (max-width: 650px) {
+                    .fp-alternate__top {
+                        grid-template-columns: 1fr;
+                        gap: 14px;
+                    }
+
+                    .fp-alternate__benefits .fp-benefits__highlighted,
+                    .fp-alternate__benefits .fp-benefits__more ul {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
             </style>
 
             <script>
@@ -1506,19 +1585,6 @@ if( have_rows('sections') ):
                                 benefitToggle.setAttribute('aria-expanded', expanding ? 'true' : 'false');
                                 if (closedLabel) closedLabel.hidden = expanding;
                                 if (openLabel) openLabel.hidden = !expanding;
-                            }
-                            return;
-                        }
-
-                        var commonToggle = event.target.closest('.fp-common-benefits__toggle');
-                        if (commonToggle) {
-                            var content = root.querySelector('.fp-common-benefits__content');
-                            var label = commonToggle.querySelector('.fp-common-benefits__toggle-text');
-                            if (content) {
-                                var expanded = commonToggle.getAttribute('aria-expanded') === 'true';
-                                content.hidden = expanded;
-                                commonToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-                                if (label) label.textContent = expanded ? 'Show' : 'Hide';
                             }
                             return;
                         }
