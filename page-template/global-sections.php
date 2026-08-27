@@ -1565,7 +1565,8 @@ if( have_rows('sections') ):
                     .fp-alternate__plan {
                         width: 100%;
                         justify-content: center;
-                        text-align: left;
+                        flex-direction: column;
+                        text-align: center;
                     }
 
                     .fp-alternate__price {
