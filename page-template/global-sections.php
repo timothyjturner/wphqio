@@ -34,7 +34,12 @@ get_header(); ?>
     $banner_styles = array();
 
     if ($banner_background_image_url) {
-        $banner_styles[] = "background-image: url('" . esc_url($banner_background_image_url) . "')";
+        $banner_styles[] = "background-image: linear-gradient(
+        90deg,
+        rgba(10, 27, 36, 0.82) 0%,
+        rgba(10, 27, 36, 0.68) 45%,
+        rgba(10, 27, 36, 0.42) 100%
+    ),url('" . esc_url($banner_background_image_url) . "')";
         $banner_styles[] = 'background-size: cover';
         $banner_styles[] = 'background-position: center center';
         $banner_styles[] = 'background-repeat: no-repeat';
