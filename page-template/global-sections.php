@@ -5,7 +5,21 @@ get_header(); ?>
 <?php 
     $hide_banner = get_field('hide_banner'); 
     $banner = get_field('banner');
+
+    /*
+     * Banner background image.
+     * Supports either:
+     * 1) a top-level ACF field named banner_background_image, or
+     * 2) a sub-field with that same name inside the existing banner group.
+     *
+     * This makes the enhancement work regardless of where the field was added
+     * in ACF, while preserving the existing background-color fallback.
+     */
     $banner_background_image = get_field('banner_background_image');
+
+    if (empty($banner_background_image) && is_array($banner) && !empty($banner['banner_background_image'])) {
+        $banner_background_image = $banner['banner_background_image'];
+    }
 
     // Support ACF Image return formats: array, attachment ID, or URL.
     $banner_background_image_url = '';
