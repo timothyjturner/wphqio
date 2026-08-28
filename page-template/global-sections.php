@@ -325,6 +325,19 @@ if( have_rows('sections') ):
             $fp_premium_title      = trim((string) get_sub_field('premium_section_title'));
             $fp_premium_intro      = trim((string) get_sub_field('premium_section_intro'));
 
+            /*
+             * Optional display controls.
+             * All default to false so existing Featured Pricing sections retain
+             * their current appearance and behavior unless an option is enabled.
+             */
+            $fp_hide_primary_plan   = (bool) get_sub_field('hide_primary_plan');
+            $fp_hide_featured_plan  = (bool) get_sub_field('hide_featured_plan');
+            $fp_hide_alternate_plan = (bool) get_sub_field('hide_alternate_plan');
+            $fp_hide_premium_1      = (bool) get_sub_field('hide_premium_plan_1');
+            $fp_hide_premium_2      = (bool) get_sub_field('hide_premium_plan_2');
+            $fp_hide_monthly_plans  = (bool) get_sub_field('hide_monthly_plans');
+            $fp_compact_view        = (bool) get_sub_field('use_compact_view');
+
             $fp_badge_text      = $fp_badge_text ?: 'Most Popular';
             $fp_eyebrow         = $fp_eyebrow ?: 'Simple Plans. Clear Value.';
             $fp_title           = $fp_title ?: 'Choose How Much We Handle';
@@ -670,6 +683,27 @@ if( have_rows('sections') ):
             $fp_premium_1 = $fp_prepare_slot($fp_premium_1_ref, 'premium_1');
             $fp_premium_2 = $fp_prepare_slot($fp_premium_2_ref, 'premium_2');
 
+            /*
+             * Visibility controls are applied only after the existing slot-preparation
+             * logic has completed. This keeps product pairing, pricing, benefits,
+             * tracking URLs, and purchase-email routing unchanged.
+             */
+            if ($fp_hide_primary_plan) {
+                $fp_primary = false;
+            }
+            if ($fp_hide_featured_plan) {
+                $fp_featured = false;
+            }
+            if ($fp_hide_alternate_plan) {
+                $fp_alternate = false;
+            }
+            if ($fp_hide_premium_1) {
+                $fp_premium_1 = false;
+            }
+            if ($fp_hide_premium_2) {
+                $fp_premium_2 = false;
+            }
+
             $fp_render_points = static function ($slot, $billing) {
                 if (!$slot) {
                     return;
@@ -778,144 +812,211 @@ if( have_rows('sections') ):
             };
 
             if ($fp_primary || $fp_featured || $fp_alternate || $fp_premium_1 || $fp_premium_2):
+
+                $fp_visible_slots = array_filter(
+                    array(
+                        'primary'   => $fp_primary,
+                        'featured'  => $fp_featured,
+                        'alternate' => $fp_alternate,
+                        'premium_1' => $fp_premium_1,
+                        'premium_2' => $fp_premium_2,
+                    )
+                );
+                $fp_visible_count = count($fp_visible_slots);
             ?>
-            <section id="featured-pricing" class="featured-pricing" data-default-billing="annual">
+            <section
+                id="featured-pricing"
+                class="featured-pricing<?php echo $fp_compact_view ? ' featured-pricing--compact' : ''; ?>"
+                data-default-billing="annual"
+                data-annual-only="<?php echo $fp_hide_monthly_plans ? 'true' : 'false'; ?>"
+            >
                 <div class="container">
 
-                    <header class="fp-heading">
-                        <?php if ($fp_eyebrow): ?>
-                            <div class="fp-eyebrow"><?php echo esc_html($fp_eyebrow); ?></div>
-                        <?php endif; ?>
+                    <?php if ($fp_compact_view): ?>
 
-                        <h2><?php echo esc_html($fp_title); ?></h2>
+                        <header class="fp-heading fp-heading--compact">
+                            <h2><?php echo esc_html($fp_title); ?></h2>
 
-                        <?php if ($fp_intro): ?>
-                            <p><?php echo esc_html($fp_intro); ?></p>
-                        <?php endif; ?>
+                            <?php if ($fp_intro): ?>
+                                <p><?php echo esc_html($fp_intro); ?></p>
+                            <?php endif; ?>
 
-                        <div class="fp-billing-selector" aria-label="Subscription billing period">
-                            <span class="fp-billing-label fp-billing-label--monthly">Monthly</span>
-                            <label class="fp-billing-toggle">
-                                <input type="checkbox" class="fp-billing-toggle__input" checked aria-label="Toggle annual billing">
-                                <span class="fp-billing-toggle__track" aria-hidden="true">
-                                    <span class="fp-billing-toggle__thumb"></span>
-                                </span>
-                            </label>
-                            <span class="fp-billing-label fp-billing-label--annual is-active">Annual</span>
-                            <span class="fp-billing-savings">Save more &amp; unlock annual benefits</span>
-                        </div>
-                    </header>
-
-                    <?php if ($fp_show_website_banner): ?>
-                        <div class="fp-website-banner" data-annual-only>
-                            <div class="fp-website-banner__icon" aria-hidden="true">🎁</div>
-                            <div>
-                                <strong>Your New Website Is Included With Annual Hosting Plans</strong>
-                                <p>Need a new website? Choose an eligible annual hosting plan and WPHQ will build your professional WordPress starter website at no additional cost.</p>
-                                <a href="/free-website-details/?wphq_event=view_free_website&amp;wphq_source=featured_pricing">See what's included →</a>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="fp-primary-grid">
-                        <?php if ($fp_primary): ?>
-                            <div class="fp-primary-grid__item">
-                                <?php $fp_render_card($fp_primary, false, false); ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if ($fp_featured): ?>
-                            <div class="fp-primary-grid__item fp-primary-grid__item--featured">
-                                <div class="fp-featured-badge">★ <?php echo esc_html($fp_badge_text); ?></div>
-                                <?php $fp_render_card($fp_featured, true, false); ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <?php if ($fp_alternate): ?>
-                        <div
-                            class="fp-alternate fp-clickable-card"
-                            role="link"
-                            tabindex="0"
-                            aria-label="Select <?php echo esc_attr($fp_alternate['title']); ?>"
-                            data-monthly-id="<?php echo esc_attr($fp_alternate['monthly_id']); ?>"
-                            data-annual-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
-                            data-monthly-price="<?php echo esc_attr(wp_json_encode($fp_alternate['monthly_price'])); ?>"
-                            data-annual-price="<?php echo esc_attr(wp_json_encode($fp_alternate['annual_price'])); ?>"
-                            data-monthly-url="<?php echo esc_url($fp_alternate['monthly_url']); ?>"
-                            data-annual-url="<?php echo esc_url($fp_alternate['annual_url']); ?>"
-                        >
-                            <div class="fp-alternate__top">
-                                <div class="fp-alternate__intro">
-                                    <strong><?php echo esc_html($fp_alternate_intro); ?></strong>
-                                    <span>WPHQ can maintain and support your WordPress site without requiring you to move your hosting.</span>
+                            <?php if (!$fp_hide_monthly_plans): ?>
+                                <div class="fp-billing-selector" aria-label="Subscription billing period">
+                                    <span class="fp-billing-label fp-billing-label--monthly">Monthly</span>
+                                    <label class="fp-billing-toggle">
+                                        <input type="checkbox" class="fp-billing-toggle__input" checked aria-label="Toggle annual billing">
+                                        <span class="fp-billing-toggle__track" aria-hidden="true">
+                                            <span class="fp-billing-toggle__thumb"></span>
+                                        </span>
+                                    </label>
+                                    <span class="fp-billing-label fp-billing-label--annual is-active">Annual</span>
+                                    <span class="fp-billing-savings">Save more &amp; unlock annual benefits</span>
                                 </div>
+                            <?php endif; ?>
+                        </header>
 
-                                <div class="fp-alternate__plan">
-                                    <?php if ($fp_alternate['icon_url']): ?>
-                                        <div class="fp-card__icon fp-alternate__icon">
-                                            <img src="<?php echo esc_url($fp_alternate['icon_url']); ?>" alt="">
-                                        </div>
+                        <div class="fp-compact-grid fp-compact-grid--count-<?php echo esc_attr($fp_visible_count); ?>">
+                            <?php foreach ($fp_visible_slots as $fp_slot_key => $fp_slot): ?>
+                                <div class="fp-compact-grid__item<?php echo $fp_slot_key === 'featured' ? ' fp-compact-grid__item--featured' : ''; ?>">
+                                    <?php if ($fp_slot_key === 'featured'): ?>
+                                        <div class="fp-featured-badge">★ <?php echo esc_html($fp_badge_text); ?></div>
                                     <?php endif; ?>
 
-                                    <div>
-                                        <?php if ($fp_alternate['plan_name']): ?>
-                                            <span class="fp-alternate__tier"><?php echo esc_html($fp_alternate['plan_name']); ?></span>
-                                        <?php endif; ?>
-                                        <strong><?php echo esc_html($fp_alternate['title']); ?></strong>
+                                    <?php
+                                    $fp_render_card(
+                                        $fp_slot,
+                                        $fp_slot_key === 'featured',
+                                        in_array($fp_slot_key, array('premium_1', 'premium_2'), true)
+                                    );
+                                    ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                    <?php else: ?>
+
+                        <header class="fp-heading">
+                            <?php if ($fp_eyebrow): ?>
+                                <div class="fp-eyebrow"><?php echo esc_html($fp_eyebrow); ?></div>
+                            <?php endif; ?>
+
+                            <h2><?php echo esc_html($fp_title); ?></h2>
+
+                            <?php if ($fp_intro): ?>
+                                <p><?php echo esc_html($fp_intro); ?></p>
+                            <?php endif; ?>
+
+                            <?php if (!$fp_hide_monthly_plans): ?>
+                                <div class="fp-billing-selector" aria-label="Subscription billing period">
+                                    <span class="fp-billing-label fp-billing-label--monthly">Monthly</span>
+                                    <label class="fp-billing-toggle">
+                                        <input type="checkbox" class="fp-billing-toggle__input" checked aria-label="Toggle annual billing">
+                                        <span class="fp-billing-toggle__track" aria-hidden="true">
+                                            <span class="fp-billing-toggle__thumb"></span>
+                                        </span>
+                                    </label>
+                                    <span class="fp-billing-label fp-billing-label--annual is-active">Annual</span>
+                                    <span class="fp-billing-savings">Save more &amp; unlock annual benefits</span>
+                                </div>
+                            <?php endif; ?>
+                        </header>
+
+                        <?php if ($fp_show_website_banner): ?>
+                            <div class="fp-website-banner" data-annual-only>
+                                <div class="fp-website-banner__icon" aria-hidden="true">🎁</div>
+                                <div>
+                                    <strong>Your New Website Is Included With Annual Hosting Plans</strong>
+                                    <p>Need a new website? Choose an eligible annual hosting plan and WPHQ will build your professional WordPress starter website at no additional cost.</p>
+                                    <a href="/free-website-details/?wphq_event=view_free_website&amp;wphq_source=featured_pricing">See what's included →</a>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($fp_primary || $fp_featured): ?>
+                            <div class="fp-primary-grid">
+                                <?php if ($fp_primary): ?>
+                                    <div class="fp-primary-grid__item">
+                                        <?php $fp_render_card($fp_primary, false, false); ?>
                                     </div>
+                                <?php endif; ?>
+
+                                <?php if ($fp_featured): ?>
+                                    <div class="fp-primary-grid__item fp-primary-grid__item--featured">
+                                        <div class="fp-featured-badge">★ <?php echo esc_html($fp_badge_text); ?></div>
+                                        <?php $fp_render_card($fp_featured, true, false); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($fp_alternate): ?>
+                            <div
+                                class="fp-alternate fp-clickable-card"
+                                role="link"
+                                tabindex="0"
+                                aria-label="Select <?php echo esc_attr($fp_alternate['title']); ?>"
+                                data-monthly-id="<?php echo esc_attr($fp_alternate['monthly_id']); ?>"
+                                data-annual-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
+                                data-monthly-price="<?php echo esc_attr(wp_json_encode($fp_alternate['monthly_price'])); ?>"
+                                data-annual-price="<?php echo esc_attr(wp_json_encode($fp_alternate['annual_price'])); ?>"
+                                data-monthly-url="<?php echo esc_url($fp_alternate['monthly_url']); ?>"
+                                data-annual-url="<?php echo esc_url($fp_alternate['annual_url']); ?>"
+                            >
+                                <div class="fp-alternate__top">
+                                    <div class="fp-alternate__intro">
+                                        <strong><?php echo esc_html($fp_alternate_intro); ?></strong>
+                                        <span>WPHQ can maintain and support your WordPress site without requiring you to move your hosting.</span>
+                                    </div>
+
+                                    <div class="fp-alternate__plan">
+                                        <?php if ($fp_alternate['icon_url']): ?>
+                                            <div class="fp-card__icon fp-alternate__icon">
+                                                <img src="<?php echo esc_url($fp_alternate['icon_url']); ?>" alt="">
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <div>
+                                            <?php if ($fp_alternate['plan_name']): ?>
+                                                <span class="fp-alternate__tier"><?php echo esc_html($fp_alternate['plan_name']); ?></span>
+                                            <?php endif; ?>
+                                            <strong><?php echo esc_html($fp_alternate['title']); ?></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="fp-alternate__price">
+                                        <span class="fp-card__price"><?php echo wp_kses_post($fp_alternate['annual_price']); ?></span>
+                                        <small class="fp-card__period">per year</small>
+                                    </div>
+
+                                    <a
+                                        class="fp-alternate__button wphq-select-plan-button"
+                                        href="<?php echo esc_url($fp_alternate['annual_url']); ?>"
+                                        data-product-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
+                                        rel="nofollow"
+                                    >Select Plan</a>
                                 </div>
 
-                                <div class="fp-alternate__price">
-                                    <span class="fp-card__price"><?php echo wp_kses_post($fp_alternate['annual_price']); ?></span>
-                                    <small class="fp-card__period">per year</small>
+                                <div class="fp-alternate__benefits">
+                                    <?php $fp_render_points($fp_alternate, 'monthly'); ?>
+                                    <?php $fp_render_points($fp_alternate, 'annual'); ?>
                                 </div>
+                            </div>
+                        <?php endif; ?>
 
-                                <a
-                                    class="fp-alternate__button wphq-select-plan-button"
-                                    href="<?php echo esc_url($fp_alternate['annual_url']); ?>"
-                                    data-product-id="<?php echo esc_attr($fp_alternate['annual_id']); ?>"
-                                    rel="nofollow"
-                                >Select Plan</a>
+                        <?php if ($fp_premium_1 || $fp_premium_2): ?>
+                            <div class="fp-premium-heading">
+                                <h3><?php echo esc_html($fp_premium_title); ?></h3>
+                                <?php if ($fp_premium_intro): ?>
+                                    <p><?php echo esc_html($fp_premium_intro); ?></p>
+                                <?php endif; ?>
                             </div>
 
-                            <div class="fp-alternate__benefits">
-                                <?php $fp_render_points($fp_alternate, 'monthly'); ?>
-                                <?php $fp_render_points($fp_alternate, 'annual'); ?>
+                            <div class="fp-premium-grid">
+                                <?php if ($fp_premium_1): ?>
+                                    <?php $fp_render_card($fp_premium_1, false, true); ?>
+                                <?php endif; ?>
+
+                                <?php if ($fp_premium_2): ?>
+                                    <?php $fp_render_card($fp_premium_2, false, true); ?>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="fp-common-benefits">
+                            <div class="fp-common-benefits__heading">All Plans Include</div>
+                            <div class="fp-common-benefits__content">
+                                <div><strong>🔒 Secure &amp; Reliable</strong><span>Professional WordPress infrastructure and SSL.</span></div>
+                                <div><strong>🛟 Expert Support</strong><span>Real help when you need it.</span></div>
+                                <div><strong>⚡ Performance Focused</strong><span>Built for speed and reliability.</span></div>
+                                <div><strong>🏷 Developer Discounts</strong><span>Annual members save on additional development time.</span></div>
                             </div>
                         </div>
+
+                        <p class="fp-terms-note">* Included monthly website edit/development time does not roll over and is subject to the terms of the applicable membership.</p>
+
                     <?php endif; ?>
 
-                    <?php if ($fp_premium_1 || $fp_premium_2): ?>
-                        <div class="fp-premium-heading">
-                            <h3><?php echo esc_html($fp_premium_title); ?></h3>
-                            <?php if ($fp_premium_intro): ?>
-                                <p><?php echo esc_html($fp_premium_intro); ?></p>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="fp-premium-grid">
-                            <?php if ($fp_premium_1): ?>
-                                <?php $fp_render_card($fp_premium_1, false, true); ?>
-                            <?php endif; ?>
-
-                            <?php if ($fp_premium_2): ?>
-                                <?php $fp_render_card($fp_premium_2, false, true); ?>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="fp-common-benefits">
-                        <div class="fp-common-benefits__heading">All Plans Include</div>
-                        <div class="fp-common-benefits__content">
-                            <div><strong>🔒 Secure &amp; Reliable</strong><span>Professional WordPress infrastructure and SSL.</span></div>
-                            <div><strong>🛟 Expert Support</strong><span>Real help when you need it.</span></div>
-                            <div><strong>⚡ Performance Focused</strong><span>Built for speed and reliability.</span></div>
-                            <div><strong>🏷 Developer Discounts</strong><span>Annual members save on additional development time.</span></div>
-                        </div>
-                    </div>
-
-                    <p class="fp-terms-note">* Included monthly website edit/development time does not roll over and is subject to the terms of the applicable membership.</p>
                 </div>
             </section>
 
@@ -1457,6 +1558,85 @@ if( have_rows('sections') ):
                     text-align: center;
                 }
 
+                /*
+                 * Compact View
+                 * ------------
+                 * Applied only when "Use Compact View" is enabled. Standard Featured
+                 * Pricing output retains all existing layout rules above.
+                 */
+                .featured-pricing--compact .container {
+                    max-width: 1480px;
+                }
+
+                .featured-pricing--compact .fp-heading--compact {
+                    max-width: 850px;
+                    margin-bottom: 36px;
+                }
+
+                .fp-compact-grid {
+                    display: grid;
+                    gap: 22px;
+                    align-items: stretch;
+                    margin: 0 auto;
+                }
+
+                .fp-compact-grid--count-1 {
+                    grid-template-columns: minmax(0, 440px);
+                    max-width: 440px;
+                    justify-content: center;
+                }
+
+                .fp-compact-grid--count-2 {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    max-width: 900px;
+                }
+
+                .fp-compact-grid--count-3 {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    max-width: 1120px;
+                }
+
+                .fp-compact-grid--count-4 {
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    max-width: 1320px;
+                }
+
+                .fp-compact-grid--count-5 {
+                    grid-template-columns: repeat(5, minmax(0, 1fr));
+                    max-width: 1480px;
+                }
+
+                .fp-compact-grid__item {
+                    position: relative;
+                    min-width: 0;
+                }
+
+                .fp-compact-grid__item .fp-card {
+                    height: 100%;
+                }
+
+                .fp-compact-grid--count-4 .fp-card,
+                .fp-compact-grid--count-5 .fp-card {
+                    padding: 28px 22px;
+                }
+
+                .fp-compact-grid--count-4 .fp-card h3,
+                .fp-compact-grid--count-5 .fp-card h3 {
+                    font-size: 24px;
+                }
+
+                .fp-compact-grid--count-5 .fp-card__price {
+                    font-size: 34px;
+                }
+
+                @media (max-width: 1100px) {
+                    .fp-compact-grid--count-4,
+                    .fp-compact-grid--count-5 {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        max-width: 900px;
+                    }
+                }
+
                 @media (max-width: 850px) {
                     .featured-pricing {
                         padding: 54px 0;
@@ -1465,6 +1645,14 @@ if( have_rows('sections') ):
                     .fp-primary-grid,
                     .fp-premium-grid {
                         grid-template-columns: 1fr;
+                    }
+
+                    .fp-compact-grid--count-2,
+                    .fp-compact-grid--count-3,
+                    .fp-compact-grid--count-4,
+                    .fp-compact-grid--count-5 {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        max-width: 760px;
                     }
 
                     .fp-primary-grid {
@@ -1495,6 +1683,14 @@ if( have_rows('sections') ):
 
                     .fp-card {
                         padding: 27px 22px;
+                    }
+
+                    .fp-compact-grid--count-2,
+                    .fp-compact-grid--count-3,
+                    .fp-compact-grid--count-4,
+                    .fp-compact-grid--count-5 {
+                        grid-template-columns: 1fr;
+                        max-width: 520px;
                     }
 
                     .fp-alternate {
