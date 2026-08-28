@@ -5,10 +5,34 @@ get_header(); ?>
 <?php 
     $hide_banner = get_field('hide_banner'); 
     $banner = get_field('banner');
+    $banner_background_image = get_field('banner_background_image');
+
+    // Support ACF Image return formats: array, attachment ID, or URL.
+    $banner_background_image_url = '';
+    if (is_array($banner_background_image) && !empty($banner_background_image['url'])) {
+        $banner_background_image_url = $banner_background_image['url'];
+    } elseif (is_numeric($banner_background_image)) {
+        $banner_background_image_url = wp_get_attachment_image_url((int) $banner_background_image, 'full');
+    } elseif (is_string($banner_background_image)) {
+        $banner_background_image_url = $banner_background_image;
+    }
+
+    $banner_styles = array();
+
+    if ($banner_background_image_url) {
+        $banner_styles[] = "background-image: url('" . esc_url($banner_background_image_url) . "')";
+        $banner_styles[] = 'background-size: cover';
+        $banner_styles[] = 'background-position: center center';
+        $banner_styles[] = 'background-repeat: no-repeat';
+    } elseif (!empty($banner['background_color'])) {
+        $banner_styles[] = 'background-color: ' . sanitize_hex_color($banner['background_color']);
+    }
+
+    $banner_style_attr = $banner_styles ? implode('; ', array_filter($banner_styles)) . ';' : '';
 ?>
 
 <?php if(!$hide_banner): ?>
-    <section class="banner" style="background-color: <?=$banner['background_color']?>;">
+    <section class="banner"<?php if ($banner_style_attr): ?> style="<?php echo esc_attr($banner_style_attr); ?>"<?php endif; ?>>
         <div class="container">
             <div class="row align-center">
                 <div class="<?php if($banner['image']){ echo 'col-md-6'; }else { echo 'col-md-12 text-center'; } ?> content" data-aos="fade-up"                     data-aos-delay="200" data-aos-duration="800">
