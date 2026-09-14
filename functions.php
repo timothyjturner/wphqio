@@ -1103,3 +1103,49 @@ add_action(
     'wphq_rate_modal_script',
     20
 );
+
+add_action('init', function () {
+    $labels = array(
+        'name' => 'WPHQ CTAs',
+        'singular_name' => 'WPHQ CTA',
+        'add_new_item' => 'Add New WPHQ CTA',
+        'edit_item' => 'Edit WPHQ CTA',
+        'new_item' => 'New WPHQ CTA',
+        'view_item' => 'View WPHQ CTA',
+        'search_items' => 'Search WPHQ CTAs',
+        'not_found' => 'No CTAs found',
+        'menu_name' => 'WPHQ CTAs',
+    );
+
+    register_post_type('wphq_cta', array(
+        'labels' => $labels,
+        'public' => false,
+        'show_ui' => true,
+        'show_in_menu' => true,
+        'show_in_rest' => true,
+        'menu_icon' => 'dashicons-megaphone',
+        'supports' => array('title', 'revisions'),
+        'has_archive' => false,
+        'rewrite' => false,
+        'query_var' => false,
+        'exclude_from_search' => true,
+        'publicly_queryable' => false,
+        'map_meta_cap' => true,
+        'capability_type' => 'post',
+    ));
+});
+
+add_filter('manage_wphq_cta_posts_columns', function ($columns) {
+    return array(
+        'cb' => $columns['cb'],
+        'title' => 'CTA Title',
+        'wphq_cta_destination' => 'Destination',
+        'date' => $columns['date'],
+    );
+});
+
+add_action('manage_wphq_cta_posts_custom_column', function ($column, $post_id) {
+    if ($column !== 'wphq_cta_destination' || !function_exists('get_field')) return;
+    $url = get_field('wphq_cta_url', $post_id);
+    if ($url) echo '<a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . esc_html($url) . '</a>';
+}, 10, 2);
