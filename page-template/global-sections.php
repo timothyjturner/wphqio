@@ -119,7 +119,7 @@ get_header(); ?>
                 
                 <?php if($banner['image']): ?>
                     <div class="col-md-6 img" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
-                        <img class="w-100" src="<?=$banner['image']['url']?>">
+                        <img class="w-100" src="<?=$banner['image']['url']?>" alt="transform your website">
                     </div>
                 <?php endif; ?>
             </div>
@@ -146,7 +146,7 @@ if( have_rows('sections') ):
                             <?php foreach($tiles as $tile): ?>
                                 <div class="col-md-3 card" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="800">
                                     <div class="inner">
-                                        <img src="<?=$tile['icon']['url']?>">
+                                        <img src="<?=$tile['icon']['url']?>" alt="service icon">
 
                                         <h3><?=$tile['title']?></h3>
 
@@ -205,7 +205,7 @@ if( have_rows('sections') ):
                         </div>
 
                         <div class="col-md-4">
-                            <img class="w-100" src="<?=$global_cta['image']['url']?>">
+                            <img class="w-100" src="<?=$global_cta['image']['url']?>" alt="Transform Your Website">
                         </div>
                     </div>
                 </div>
