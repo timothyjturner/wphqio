@@ -27,7 +27,7 @@
     <div class="container">
         <div class="row align-center">
             <div class="header-logo col-md-3">
-                <a href="/" aria-label="WPHQ home" alt="WPHQ home"><img src="<?=$header['logo']['url']?>"></a>
+                <a href="/" aria-label="WPHQ home" alt="WPHQ home"><img src="<?=$header['logo']['url']?>" alt="WPHQ Logo"></a>
             </div>
 
             <div class="header-nav col-md-9">
