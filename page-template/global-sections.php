@@ -849,7 +849,7 @@ if( have_rows('sections') ):
                         href="<?php echo esc_url($slot['annual_url']); ?>"
                         data-product-id="<?php echo esc_attr($slot['annual_id']); ?>"
                         rel="nofollow"
-                    >Select Plan</a>
+                    >Get Started</a>
                 </article>
                 <?php
             };
